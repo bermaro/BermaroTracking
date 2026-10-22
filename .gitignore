@@ -1,0 +1,4 @@
+# Lokale Hilfsdateien nicht hochladen
+.DS_Store
+Thumbs.db
+*.log
