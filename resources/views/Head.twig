@@ -1,0 +1,180 @@
+{# BERMARO Tracking: Tag Manager im <head> laden #}
+<script>
+    window.dataLayer = window.dataLayer || [];
+    window.BermaroTrackingConfig = {{ configJson | raw }};
+</script>
+<script>
+    (function (window, document) {
+        "use strict";
+
+        var cfg = window.BermaroTrackingConfig;
+        if (!cfg || !cfg.active || !cfg.containerId || window.BermaroTrackingHeadStarted) {
+            return;
+        }
+        window.BermaroTrackingHeadStarted = true;
+
+        var dataLayer = window.dataLayer;
+        var useConsentMode = cfg.consentMode === "basic" || cfg.consentMode === "advanced";
+        var lastConsentState = "";
+        var lastConsentSnapshot = null;
+        var gtmLoaded = false;
+
+        /* gtag-Hilfsfunktion (schreibt nur in den dataLayer, lädt nichts nach) */
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+
+        /* Ist derselbe Tag-Manager-Container schon von einem anderen Plugin eingebunden?
+           (z. B. weil das alte Plugin noch aktiv ist) – dann NICHT ein zweites Mal laden. */
+        function containerAlreadyPresent() {
+            if (window.google_tag_manager && window.google_tag_manager[cfg.containerId]) {
+                return true;
+            }
+            var scripts = document.getElementsByTagName("script");
+            for (var i = 0; i < scripts.length; i++) {
+                var src = scripts[i].src || "";
+                if (src.indexOf("googletagmanager.com/gtm.js") !== -1 && src.indexOf(cfg.containerId) !== -1) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        /* Hilfe: Ist ein Consent-Schlüssel erlaubt? */
+        function isConsented(key) {
+            var cm = window.ConsentManager;
+            return !!(key && cm && typeof cm.isConsented === "function" && cm.isConsented(key));
+        }
+
+        /* Aktuellen Einwilligungsstand aus dem plentyShop-Cookie-Banner lesen */
+        function readConsentState() {
+            var cm = window.ConsentManager;
+            if (!cm || typeof cm.hasResponse !== "function" || !cm.hasResponse()) {
+                return null;
+            }
+            var analytics = isConsented(cfg.consentKeys.analytics);
+            var ads = isConsented(cfg.consentKeys.ads);
+            return {
+                analytics_storage: analytics ? "granted" : "denied",
+                ad_storage: ads ? "granted" : "denied",
+                ad_user_data: ads ? "granted" : "denied",
+                ad_personalization: ads ? "granted" : "denied"
+            };
+        }
+
+        /* Einwilligungen als Text (zum Erkennen echter Änderungen) */
+        function consentSnapshot() {
+            var cm = window.ConsentManager;
+            if (!cm || typeof cm.getConsents !== "function") {
+                return null;
+            }
+            try {
+                return JSON.stringify(cm.getConsents() || {});
+            } catch (error) {
+                return null;
+            }
+        }
+
+        /* Consent Mode: Einwilligung an Google melden (nur wenn eingeschaltet) */
+        function updateConsent() {
+            if (!useConsentMode) {
+                return;
+            }
+            var state = readConsentState();
+            if (!state) {
+                return;
+            }
+            var key = JSON.stringify(state);
+            if (key === lastConsentState) {
+                return;
+            }
+            lastConsentState = key;
+            gtag("consent", "update", state);
+        }
+
+        /* Den Tag Manager selbst laden (nur einmal) */
+        function loadGtm() {
+            if (gtmLoaded) {
+                return;
+            }
+            gtmLoaded = true;
+            if (containerAlreadyPresent()) {
+                if (window.console && window.console.warn) {
+                    window.console.warn("[BermaroTracking] Container " + cfg.containerId + " ist schon eingebunden (altes Plugin noch aktiv?) – wird nicht doppelt geladen.");
+                }
+                return;
+            }
+            updateConsent();
+            dataLayer.push({ "gtm.start": new Date().getTime(), event: "gtm.js" });
+            var script = document.createElement("script");
+            script.async = true;
+            script.src = "https://www.googletagmanager.com/gtm.js?id=" + encodeURIComponent(cfg.containerId);
+            var first = document.getElementsByTagName("script")[0];
+            first.parentNode.insertBefore(script, first);
+        }
+
+        /* Darf der Tag Manager laden? (bei Einwilligungspflicht: sobald IRGENDEIN Dienst erlaubt ist) */
+        function mayLoadGtm() {
+            var needsConsent = cfg.consentMode === "basic" || cfg.loadGtmOnlyAfterConsent;
+            if (!needsConsent) {
+                return true;
+            }
+            return isConsented(cfg.consentKeys.analytics) || isConsented(cfg.consentKeys.ads) || isConsented(cfg.consentKeys.bing);
+        }
+
+        function tryLoadGtm() {
+            if (mayLoadGtm()) {
+                loadGtm();
+            }
+        }
+
+        /* Standard-Einwilligung: alles abgelehnt, bis der Besucher zustimmt */
+        if (useConsentMode) {
+            gtag("consent", "default", {
+                ad_storage: "denied",
+                analytics_storage: "denied",
+                ad_user_data: "denied",
+                ad_personalization: "denied",
+                wait_for_update: 500
+            });
+            updateConsent();
+        }
+
+        /* Für das Haupt-Skript bereitstellen */
+        window.BermaroTrackingUpdateConsent = updateConsent;
+        window.BermaroTrackingLoadGtm = tryLoadGtm;
+
+        /* Änderungen im Cookie-Banner (mehrere Meldungen kurz hintereinander werden zusammengefasst).
+           "consentChanged" wird nur gesendet, wenn sich die Auswahl wirklich geändert hat. */
+        var consentTimer = null;
+        document.addEventListener("consent-change", function () {
+            if (consentTimer) {
+                window.clearTimeout(consentTimer);
+            }
+            consentTimer = window.setTimeout(function () {
+                consentTimer = null;
+                updateConsent();
+                tryLoadGtm();
+                var snapshot = consentSnapshot();
+                if (snapshot !== null && snapshot === lastConsentSnapshot) {
+                    return;
+                }
+                lastConsentSnapshot = snapshot;
+                if (cfg.pushConsentChanged) {
+                    dataLayer.push({ event: "consentChanged" });
+                }
+            }, 300);
+        });
+
+        document.addEventListener("DOMContentLoaded", function () {
+            // Stand beim Laden merken, damit ein Speichern ohne Änderung kein "consentChanged" auslöst
+            if (lastConsentSnapshot === null) {
+                lastConsentSnapshot = consentSnapshot();
+            }
+            updateConsent();
+            tryLoadGtm();
+        });
+
+        tryLoadGtm();
+    })(window, document);
+</script>
