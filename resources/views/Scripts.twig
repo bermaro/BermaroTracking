@@ -1,0 +1,5 @@
+{# BERMARO Tracking: Bestelldaten (nur auf der Bestellbestätigung gefüllt) und Haupt-Skript #}
+<script>
+    window.BermaroTrackingOrder = {{ orderJson | raw }};
+</script>
+<script src="{{ plugin_path('BermaroTracking') }}/js/bermaro-tracking.js?v={{ version | url_encode }}"></script>
