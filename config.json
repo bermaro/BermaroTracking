@@ -1,0 +1,349 @@
+{
+    "formatVersion": 1,
+    "menu": {
+        "Config.tabGeneral": {
+            "label": "Config.tabGeneral",
+            "formFields": {
+                "general.active": {
+                    "type": "checkBox",
+                    "required": false,
+                    "label": "Config.generalActiveLabel",
+                    "options": {
+                        "defaultValue": "true"
+                    }
+                },
+                "general.containerId": {
+                    "type": "inputText",
+                    "required": false,
+                    "label": "Config.generalContainerIdLabel",
+                    "options": {
+                        "defaultValue": ""
+                    }
+                },
+                "general.clientMapping": {
+                    "type": "inputText",
+                    "required": false,
+                    "label": "Config.generalClientMappingLabel",
+                    "options": {
+                        "defaultValue": ""
+                    }
+                },
+                "general.formats": {
+                    "type": "multiCheckBox",
+                    "required": false,
+                    "label": "Config.generalFormatsLabel",
+                    "options": {
+                        "defaultValue": "felixries",
+                        "checkBoxValues": [
+                            {
+                                "value": "felixries",
+                                "caption": "Config.generalFormatFelixries"
+                            },
+                            {
+                                "value": "cfour",
+                                "caption": "Config.generalFormatCfour"
+                            },
+                            {
+                                "value": "ga4",
+                                "caption": "Config.generalFormatGa4"
+                            }
+                        ]
+                    }
+                },
+                "general.idSource": {
+                    "type": "selectBox",
+                    "required": false,
+                    "label": "Config.generalIdSourceLabel",
+                    "options": {
+                        "defaultValue": "variationId",
+                        "selectBoxValues": [
+                            {
+                                "value": "variationId",
+                                "caption": "Config.generalIdSourceVariationId"
+                            },
+                            {
+                                "value": "itemId",
+                                "caption": "Config.generalIdSourceItemId"
+                            },
+                            {
+                                "value": "variationNumber",
+                                "caption": "Config.generalIdSourceVariationNumber"
+                            }
+                        ]
+                    }
+                },
+                "general.affiliation": {
+                    "type": "inputText",
+                    "required": false,
+                    "label": "Config.generalAffiliationLabel",
+                    "options": {
+                        "defaultValue": ""
+                    }
+                },
+                "general.debug": {
+                    "type": "checkBox",
+                    "required": false,
+                    "label": "Config.generalDebugLabel",
+                    "options": {
+                        "defaultValue": "false"
+                    }
+                }
+            }
+        },
+        "Config.tabEvents": {
+            "label": "Config.tabEvents",
+            "formFields": {
+                "events.enabled": {
+                    "type": "multiCheckBox",
+                    "required": false,
+                    "label": "Config.eventsEnabledLabel",
+                    "options": {
+                        "defaultValue": "all",
+                        "checkBoxValues": [
+                            {
+                                "value": "itemList",
+                                "caption": "Config.eventsItemList"
+                            },
+                            {
+                                "value": "productClick",
+                                "caption": "Config.eventsProductClick"
+                            },
+                            {
+                                "value": "itemView",
+                                "caption": "Config.eventsItemView"
+                            },
+                            {
+                                "value": "cart",
+                                "caption": "Config.eventsCart"
+                            },
+                            {
+                                "value": "wishlist",
+                                "caption": "Config.eventsWishlist"
+                            },
+                            {
+                                "value": "viewCart",
+                                "caption": "Config.eventsViewCart"
+                            },
+                            {
+                                "value": "checkout",
+                                "caption": "Config.eventsCheckout"
+                            },
+                            {
+                                "value": "purchase",
+                                "caption": "Config.eventsPurchase"
+                            }
+                        ]
+                    }
+                },
+                "events.itemListOnAllPages": {
+                    "type": "checkBox",
+                    "required": false,
+                    "label": "Config.eventsItemListOnAllPagesLabel",
+                    "options": {
+                        "defaultValue": "false"
+                    }
+                },
+                "events.maxListItems": {
+                    "type": "inputText",
+                    "required": false,
+                    "label": "Config.eventsMaxListItemsLabel",
+                    "options": {
+                        "defaultValue": "24"
+                    }
+                }
+            }
+        },
+        "Config.tabPurchase": {
+            "label": "Config.tabPurchase",
+            "formFields": {
+                "purchase.valueBasis": {
+                    "type": "selectBox",
+                    "required": false,
+                    "label": "Config.purchaseValueBasisLabel",
+                    "options": {
+                        "defaultValue": "itemSumNet",
+                        "selectBoxValues": [
+                            {
+                                "value": "itemSumNet",
+                                "caption": "Config.purchaseValueItemSumNet"
+                            },
+                            {
+                                "value": "itemSumGross",
+                                "caption": "Config.purchaseValueItemSumGross"
+                            },
+                            {
+                                "value": "totalNet",
+                                "caption": "Config.purchaseValueTotalNet"
+                            },
+                            {
+                                "value": "totalGross",
+                                "caption": "Config.purchaseValueTotalGross"
+                            }
+                        ]
+                    }
+                },
+                "purchase.sendCustomerData": {
+                    "type": "checkBox",
+                    "required": false,
+                    "label": "Config.purchaseSendCustomerDataLabel",
+                    "options": {
+                        "defaultValue": "true"
+                    }
+                },
+                "purchase.onlyOnce": {
+                    "type": "checkBox",
+                    "required": false,
+                    "label": "Config.purchaseOnlyOnceLabel",
+                    "options": {
+                        "defaultValue": "true"
+                    }
+                }
+            }
+        },
+        "Config.tabConsent": {
+            "label": "Config.tabConsent",
+            "formFields": {
+                "consent.mode": {
+                    "type": "selectBox",
+                    "required": false,
+                    "label": "Config.consentModeLabel",
+                    "options": {
+                        "defaultValue": "off",
+                        "selectBoxValues": [
+                            {
+                                "value": "off",
+                                "caption": "Config.consentModeOff"
+                            },
+                            {
+                                "value": "basic",
+                                "caption": "Config.consentModeBasic"
+                            },
+                            {
+                                "value": "advanced",
+                                "caption": "Config.consentModeAdvanced"
+                            }
+                        ]
+                    }
+                },
+                "consent.loadGtmOnlyAfterConsent": {
+                    "type": "checkBox",
+                    "required": false,
+                    "label": "Config.consentLoadGtmOnlyAfterConsentLabel",
+                    "options": {
+                        "defaultValue": "false"
+                    }
+                },
+                "consent.pushConsentChanged": {
+                    "type": "checkBox",
+                    "required": false,
+                    "label": "Config.consentPushConsentChangedLabel",
+                    "options": {
+                        "defaultValue": "true"
+                    }
+                },
+                "consent.registerAnalytics": {
+                    "type": "checkBox",
+                    "required": false,
+                    "label": "Config.consentRegisterAnalyticsLabel",
+                    "options": {
+                        "defaultValue": "true"
+                    }
+                },
+                "consent.analyticsGroup": {
+                    "type": "selectBox",
+                    "required": false,
+                    "label": "Config.consentAnalyticsGroupLabel",
+                    "options": {
+                        "defaultValue": "tracking",
+                        "selectBoxValues": [
+                            {
+                                "value": "tracking",
+                                "caption": "Config.consentGroupTracking"
+                            },
+                            {
+                                "value": "marketing",
+                                "caption": "Config.consentGroupMarketing"
+                            }
+                        ]
+                    }
+                },
+                "consent.analyticsKey": {
+                    "type": "inputText",
+                    "required": false,
+                    "label": "Config.consentAnalyticsKeyLabel",
+                    "options": {
+                        "defaultValue": "googleanalytics"
+                    }
+                },
+                "consent.registerAds": {
+                    "type": "checkBox",
+                    "required": false,
+                    "label": "Config.consentRegisterAdsLabel",
+                    "options": {
+                        "defaultValue": "true"
+                    }
+                },
+                "consent.adsGroup": {
+                    "type": "selectBox",
+                    "required": false,
+                    "label": "Config.consentAdsGroupLabel",
+                    "options": {
+                        "defaultValue": "marketing",
+                        "selectBoxValues": [
+                            {
+                                "value": "tracking",
+                                "caption": "Config.consentGroupTracking"
+                            },
+                            {
+                                "value": "marketing",
+                                "caption": "Config.consentGroupMarketing"
+                            }
+                        ]
+                    }
+                },
+                "consent.adsKey": {
+                    "type": "inputText",
+                    "required": false,
+                    "label": "Config.consentAdsKeyLabel",
+                    "options": {
+                        "defaultValue": "googleads"
+                    }
+                },
+                "consent.registerBing": {
+                    "type": "checkBox",
+                    "required": false,
+                    "label": "Config.consentRegisterBingLabel",
+                    "options": {
+                        "defaultValue": "true"
+                    }
+                },
+                "consent.bingGroup": {
+                    "type": "selectBox",
+                    "required": false,
+                    "label": "Config.consentBingGroupLabel",
+                    "options": {
+                        "defaultValue": "tracking",
+                        "selectBoxValues": [
+                            {
+                                "value": "tracking",
+                                "caption": "Config.consentGroupTracking"
+                            },
+                            {
+                                "value": "marketing",
+                                "caption": "Config.consentGroupMarketing"
+                            }
+                        ]
+                    }
+                },
+                "consent.bingKey": {
+                    "type": "inputText",
+                    "required": false,
+                    "label": "Config.consentBingKeyLabel",
+                    "options": {
+                        "defaultValue": "bingads"
+                    }
+                }
+            }
+        }
+    }
+}
