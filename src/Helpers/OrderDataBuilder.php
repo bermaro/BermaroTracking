@@ -2,6 +2,8 @@
 
 namespace BermaroTracking\Helpers;
 
+use IO\Models\LocalizedOrder;
+
 /**
  * Baut aus der Bestellung, die auf der Bestellbestätigungsseite angezeigt wird,
  * ein neutrales Datenpaket. Das JavaScript macht daraus anschließend die Formate
@@ -190,7 +192,8 @@ class OrderDataBuilder
         if (is_array($localizedOrder)) {
             return $localizedOrder;
         }
-        if (is_object($localizedOrder) && method_exists($localizedOrder, 'toArray')) {
+        // Hinweis: method_exists() ist in plentymarkets-Plugins verboten, daher instanceof.
+        if ($localizedOrder instanceof LocalizedOrder) {
             $array = $localizedOrder->toArray();
             return is_array($array) ? $array : null;
         }

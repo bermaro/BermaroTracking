@@ -1,5 +1,9 @@
 # Versionshinweise BERMARO Tracking
 
+## 1.0.1 (22.10.2026)
+
+- Korrektur: Die von plentymarkets nicht erlaubte PHP-Funktion method_exists entfernt (Bereitstellung schlug fehl).
+
 ## 1.0.0 (22.10.2026)
 
 - Erste Version.
