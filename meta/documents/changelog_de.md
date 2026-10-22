@@ -1,5 +1,12 @@
 # Versionshinweise BERMARO Tracking
 
+## 1.0.11 (22.10.2026)
+
+- cfour-Format (pelletgrill.rocks, B2B), Abgleich mit dem bisherigen Plugin im Live-Shop b2b.bermaro.de:
+  - Kategorieseiten melden "pageType": "categoryItem" (wird vom Google-Ads-Remarketing-Tag beider Container ausgewertet).
+  - Artikel: "price" immer brutto, zusätzlich "priceNet", "amount", "amountNet", "rrp", "rrpNet" und "number" – auch im B2B-Shop mit Nettoanzeige.
+  - Bestellung: Positionspreise brutto + "priceNet" (wie bisher beim alten Plugin).
+
 ## 1.0.10 (22.10.2026)
 
 - Artikellisten: Auch Artikelkacheln, die plentyShop erst beim Scrollen aufbaut, werden jetzt sofort mitgemeldet (Daten aus der Seite gelesen). Vorher kamen z. B. auf b2b.bermaro.de nur 8 von 20 Artikeln an.
