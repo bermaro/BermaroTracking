@@ -1,5 +1,17 @@
 {# BERMARO Tracking: Bestelldaten (nur auf der Bestellbestätigung gefüllt) und Haupt-Skript #}
 <script>
     window.BermaroTrackingOrder = {{ orderJson | raw }};
+    {# Das Haupt-Skript wird per Inline-Lader eingebunden. Grund: plentyShop führt externe
+       <script src>-Tags in diesem Container beim Seitenaufbau nicht zuverlässig aus,
+       Inline-Code dagegen schon (getestet 22.10.2026 auf lackier-bedarf.info). #}
+    (function (document) {
+        if (window.BermaroTrackingStarted || window.BermaroTrackingLoaderStarted) {
+            return;
+        }
+        window.BermaroTrackingLoaderStarted = true;
+        var script = document.createElement("script");
+        script.src = {{ (plugin_path('BermaroTracking') ~ '/js/bermaro-tracking.js?v=' ~ version) | json_encode | raw }};
+        script.async = false;
+        (document.body || document.head || document.documentElement).appendChild(script);
+    })(document);
 </script>
-<script src="{{ plugin_path('BermaroTracking') }}/js/bermaro-tracking.js?v={{ version | url_encode }}"></script>

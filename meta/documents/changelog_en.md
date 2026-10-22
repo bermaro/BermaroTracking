@@ -1,5 +1,9 @@
 # Release notes BERMARO Tracking
 
+## 1.0.2 (2026-10-22)
+
+- Fix: main script is now loaded via an inline loader, because plentyShop did not execute external script tags in the "Script.AfterScriptsLoaded" container on page load.
+
 ## 1.0.1 (2026-10-22)
 
 - Fix: removed PHP function method_exists, which plentymarkets does not allow (deployment failed).
