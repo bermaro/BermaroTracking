@@ -518,7 +518,11 @@
     /* FORMAT 2: cfour / bisheriges Plugin pelletgrill.rocks + B2B         */
     /* ------------------------------------------------------------------ */
 
-    /** Artikel im cfour-Format ("name" und "itemName" werden beide gefüllt) */
+    /**
+     * Artikel im cfour-Format ("name" und "itemName" werden beide gefüllt).
+     * Kategorie wie beim bisherigen Plugin als vollständiger Pfad, z. B.
+     * "Pelletgrills Pelletsmoker > Smoker - Grills" (Abgleich mit pelletgrill.rocks, 22.10.2026).
+     */
     function cfourProduct(product, extra) {
         var result = {
             id: productId(product),
@@ -526,7 +530,7 @@
             itemName: product.name,
             price: toNumber(product.price),
             brand: product.brand,
-            category: categoryName(product),
+            category: (product.categoryPath && product.categoryPath.length) ? product.categoryPath.join(" > ") : categoryName(product),
             variant: product.variant,
             quantity: product.quantity || 1
         };
@@ -557,6 +561,20 @@
             vatValue: toNumber(toNumber(data.basketAmount) - toNumber(data.basketAmountNet)),
             vatRate: toNumber(get(data, "totalVats.0.vatValue", 0))
         };
+    }
+
+    /** Listenname im cfour-Format, z. B. "Kategorieliste: Pelletgrills Pelletsmoker > Smoker - Grills, Seite: 1" */
+    function cfourListName(path) {
+        var page = parseInt(get(store(), "state.itemList.page", 0), 10);
+        if (!page) {
+            var match = /[?&]page=(\d+)/.exec(window.location.search || "");
+            page = match ? parseInt(match[1], 10) : 1;
+        }
+        if (templateType() === "search") {
+            return "Suchergebnisse: " + searchTerm() + ", Seite: " + page;
+        }
+        var name = (path && path.length) ? path.join(" > ") : currentCategoryName();
+        return "Kategorieliste: " + name + ", Seite: " + page;
     }
 
     /* ------------------------------------------------------------------ */
@@ -639,12 +657,14 @@
             }, products, felixExtra);
         }
         if (USE_CFOUR) {
+            // Listenname und Position (ab 1) wie beim bisherigen Plugin
+            var cfourList = cfourListName(path);
             push({
                 event: "itemListView",
                 currency: currency(),
                 categoryName: list,
                 itemList: map(products, function (product, index) {
-                    return cfourProduct(product, { position: index, list: list });
+                    return cfourProduct(product, { position: index + 1, list: cfourList });
                 })
             });
         }
@@ -679,7 +699,7 @@
             push({
                 event: "productClick",
                 currency: currency(),
-                clickedItem: [cfourProduct(product, { position: position, list: list, productLink: link || "" })]
+                clickedItem: [cfourProduct(product, { position: position + 1, list: cfourListName(breadcrumbPath()), productLink: link || "" })]
             });
         }
         if (USE_GA4) {
