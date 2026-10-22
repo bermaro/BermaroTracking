@@ -147,9 +147,27 @@
         return toText(get(window, "App.templateType", ""));
     }
 
-    /** Aktuelle Währung */
+    /*
+     * Aktuelle Währung als ISO-Code (z. B. "EUR").
+     * pelletgrill.rocks und b2b.bermaro.de liefern hier das Zeichen "€" statt "EUR"
+     * (Feststellung 22.10.2026). Google Analytics 4 und Google Ads verlangen aber den ISO-Code;
+     * das bisherige Plugin sendete ebenfalls "EUR". Darum wird das Zeichen umgewandelt.
+     */
+    var CURRENCY_SYMBOLS = { "€": "EUR", "$": "USD", "£": "GBP", "Fr.": "CHF", "CHF": "CHF", "zł": "PLN", "Kč": "CZK" };
+
     function currency() {
-        return toText(get(window, "App.activeCurrency", "")) || "EUR";
+        var value = toText(get(window, "App.activeCurrency", "")).trim();
+        if (/^[A-Z]{3}$/.test(value)) {
+            return value;
+        }
+        if (CURRENCY_SYMBOLS.hasOwnProperty(value)) {
+            return CURRENCY_SYMBOLS[value];
+        }
+        var basketCurrency = toText(get(store(), "state.basket.data.currency", "")).trim();
+        if (/^[A-Z]{3}$/.test(basketCurrency)) {
+            return basketCurrency;
+        }
+        return "EUR";
     }
 
     /** Shop-Name für "affiliation" */

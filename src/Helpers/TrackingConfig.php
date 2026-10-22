@@ -23,7 +23,7 @@ class TrackingConfig
     const PLUGIN = 'BermaroTracking';
 
     /** Plugin-Version, wird zum Neuladen der JS-Datei (Cache) verwendet */
-    const VERSION = '1.0.11';
+    const VERSION = '1.0.12';
 
     /** Alle möglichen Datenformate */
     const FORMATS = ['felixries', 'cfour', 'ga4'];
