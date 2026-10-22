@@ -1,5 +1,9 @@
 # Versionshinweise BERMARO Tracking
 
+## 1.0.10 (22.10.2026)
+
+- Artikellisten: Auch Artikelkacheln, die plentyShop erst beim Scrollen aufbaut, werden jetzt sofort mitgemeldet (Daten aus der Seite gelesen). Vorher kamen z. B. auf b2b.bermaro.de nur 8 von 20 Artikeln an.
+
 ## 1.0.9 (22.10.2026)
 
 - cfour-Format (pelletgrill.rocks, B2B): Kategorie als vollständiger Pfad ("A > B"), Listenname "Kategorieliste: …, Seite: n" und Position ab 1 – wie beim bisherigen Plugin (Abgleich mit dem Live-Shop).

@@ -1,5 +1,9 @@
 # Release notes BERMARO Tracking
 
+## 1.0.10 (2026-10-22)
+
+- Item lists: tiles that plentyShop only renders on scroll are now reported immediately (data read from the page).
+
 ## 1.0.9 (2026-10-22)
 
 - cfour format: full category path ("A > B"), list name "Kategorieliste: …, Seite: n" and 1-based positions, matching the previous plugin.
