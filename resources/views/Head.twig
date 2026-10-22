@@ -128,6 +128,36 @@
             }
         }
 
+        /*
+         * Felix-Format: Cookie "consentActiveStatus" setzen – GENAU wie das alte Felix-Ries-Plugin.
+         * Der Tag-Manager-Container von lackier-bedarf.info (GTM-PKMRNKBW) liest dieses Cookie in
+         * einer Variable und prüft damit bei 13 Auslösern (u. a. Google-Ads-Conversion), ob der
+         * Besucher eingewilligt hat. Fehlt das Cookie, feuern diese Tags NICHT.
+         * Inhalt: [{"dienst":"true"|"false", ...}] – "true" = Dienst braucht eine Einwilligung
+         * (ist im Cookie-Banner registriert). Ob tatsächlich eingewilligt wurde, entnimmt der
+         * Container dem plentyShop-Cookie-Banner-Cookie. (Festgestellt am 22.10.2026.)
+         */
+        if ((cfg.formats || []).indexOf("felixries") !== -1) {
+            try {
+                var felixKeys = ["googleanalytics", "googleads", "facebookpixel", "bingads", "pinterest", "adcell",
+                    "econda", "channelpilot", "sendinblue", "hotjar", "moebelde", "intelligentreach", "clarity", "awin", "belboon"];
+                var status = {};
+                var activeKeys = cfg.activeConsentKeys || [];
+                var i;
+                for (i = 0; i < felixKeys.length; i++) {
+                    status[felixKeys[i]] = activeKeys.indexOf(felixKeys[i]) !== -1 ? "true" : "false";
+                }
+                for (i = 0; i < activeKeys.length; i++) {
+                    status[activeKeys[i]] = "true";
+                }
+                document.cookie = "consentActiveStatus=" + JSON.stringify([status]) +
+                    "; path=/; max-age=31536000; SameSite=Lax" +
+                    (window.location.protocol === "https:" ? "; Secure" : "");
+            } catch (error) {
+                // Cookie konnte nicht gesetzt werden – Shop läuft trotzdem weiter
+            }
+        }
+
         /* Standard-Einwilligung: alles abgelehnt, bis der Besucher zustimmt */
         if (useConsentMode) {
             gtag("consent", "default", {
