@@ -1033,6 +1033,170 @@
         }
     });
 
+    /* ------------------------------------------------------------------ */
+    /* Bestellung direkt aus der Bestätigungsseite lesen (Sicherheitsnetz) */
+    /* ------------------------------------------------------------------ */
+
+    /*
+     * Auf der ShopBuilder-Bestellbestätigung liefert plentyShop die Bestellung teils nicht an den
+     * Server-Teil des Plugins (Test 22.10.2026). Die Seite selbst enthält die Bestellung aber
+     * (z. B. im Baustein "Zahlungsart ändern"). Dann wird sie hier ausgelesen und genauso
+     * aufbereitet wie auf dem Server (OrderDataBuilder.php).
+     */
+    var ITEM_TYPES = [1, 2, 9, 13];
+    var TYPE_SHIPPING = 6;
+    var TYPE_PROMOTIONAL_COUPON = 4;
+    var MAX_ORDER_AGE_MINUTES = 60;
+
+    /** Rohe Bestellung in den Vue-Bausteinen der Seite suchen */
+    function rawOrderFromPage() {
+        var nodes = document.querySelectorAll("*");
+        for (var i = 0; i < nodes.length; i++) {
+            var vm = nodes[i].__vue__;
+            if (!vm || !vm.$props) {
+                continue;
+            }
+            var candidates = [vm.$props.currentOrder, vm.$props.order, get(vm.$props, "orderData.order", null)];
+            for (var j = 0; j < candidates.length; j++) {
+                var candidate = candidates[j];
+                if (candidate && candidate.id && candidate.orderItems && candidate.orderItems.length) {
+                    return candidate;
+                }
+            }
+        }
+        return null;
+    }
+
+    /** Betrag in Kundenwährung (wie plentyShop: nicht die Systemwährung bevorzugen) */
+    function customerAmount(amounts) {
+        if (!amounts || !amounts.length) {
+            return {};
+        }
+        for (var i = 0; i < amounts.length; i++) {
+            if (amounts[i] && !amounts[i].isSystemCurrency) {
+                return amounts[i];
+            }
+        }
+        return amounts[0] || {};
+    }
+
+    /** Bestelldaten im selben Aufbau wie OrderDataBuilder.php */
+    function buildOrderFromRaw(order) {
+        var items = [];
+        var itemsQuantity = 0;
+        var firstVatRate = 0;
+        var itemSumGross = 0;
+        var itemSumNet = 0;
+        var shippingGross = 0;
+        var shippingNet = 0;
+        var couponGross = 0;
+        var couponNet = 0;
+        var orderItems = order.orderItems || [];
+
+        for (var i = 0; i < orderItems.length; i++) {
+            var orderItem = orderItems[i] || {};
+            var typeId = parseInt(orderItem.typeId, 10) || 0;
+            var amount = customerAmount(orderItem.amounts);
+            var quantity = parseFloat(orderItem.quantity) || 0;
+            var priceGross = parseFloat(amount.priceGross) || 0;
+            var priceNet = parseFloat(amount.priceNet) || 0;
+
+            if (typeId === TYPE_SHIPPING) {
+                shippingGross += priceGross;
+                shippingNet += priceNet;
+                continue;
+            }
+            if (typeId === TYPE_PROMOTIONAL_COUPON) {
+                couponGross += priceGross * (quantity > 0 ? quantity : 1);
+                couponNet += priceNet * (quantity > 0 ? quantity : 1);
+                continue;
+            }
+            if (ITEM_TYPES.indexOf(typeId) === -1) {
+                continue;
+            }
+            var vatRate = parseFloat(orderItem.vatRate) || 0;
+            if (firstVatRate === 0 && vatRate > 0) {
+                firstVatRate = vatRate;
+            }
+            items.push({
+                variationId: parseInt(orderItem.itemVariationId, 10) || 0,
+                itemId: 0,
+                number: "",
+                name: toText(orderItem.orderItemName),
+                brand: "",
+                variant: "",
+                priceGross: toNumber(priceGross),
+                priceNet: toNumber(priceNet),
+                quantity: quantity,
+                vatRate: vatRate
+            });
+            itemsQuantity += quantity;
+            itemSumGross += priceGross * quantity;
+            itemSumNet += priceNet * quantity;
+        }
+
+        var orderAmount = customerAmount(order.amounts);
+        var totalGross = parseFloat(orderAmount.grossTotal) || 0;
+        var totalNet = parseFloat(orderAmount.netTotal) || 0;
+        var address = order.billingAddress || {};
+        var email = "";
+        var options = address.options || [];
+        for (var k = 0; k < options.length; k++) {
+            if (options[k] && parseInt(options[k].typeId, 10) === 5 && options[k].value) {
+                email = toText(options[k].value).trim();
+                break;
+            }
+        }
+        var contactId = 0;
+        var relations = order.relations || [];
+        for (var r = 0; r < relations.length; r++) {
+            if (relations[r] && relations[r].referenceType === "contact" && parseInt(relations[r].referenceId, 10) > 0) {
+                contactId = parseInt(relations[r].referenceId, 10);
+                break;
+            }
+        }
+
+        return {
+            orderId: parseInt(order.id, 10) || 0,
+            createdAt: toText(order.createdAt),
+            currency: toText(orderAmount.currency) || "EUR",
+            itemSumGross: toNumber(itemSumGross + couponGross),
+            itemSumNet: toNumber(itemSumNet + couponNet),
+            shippingGross: toNumber(shippingGross),
+            shippingNet: toNumber(shippingNet),
+            totalGross: toNumber(totalGross),
+            totalNet: toNumber(totalNet),
+            vatTotal: toNumber(orderAmount.vatTotal !== undefined ? orderAmount.vatTotal : totalGross - totalNet),
+            vatRate: firstVatRate,
+            couponCode: "",
+            couponValue: toNumber(Math.abs(couponGross)),
+            isNet: false,
+            paymentMethod: "",
+            shippingProvider: "",
+            shippingProfile: "",
+            itemsQuantity: itemsQuantity,
+            items: items,
+            customer: {
+                contactId: contactId,
+                isGuest: contactId <= 0,
+                email: email,
+                postalCode: toText(address.postalCode),
+                town: toText(address.town),
+                countryIso2: toText(get(address, "country.isoCode2", "")),
+                countryName: toText(get(address, "country.name", ""))
+            }
+        };
+    }
+
+    /** Ist die Bestellung frisch genug, um sie zu melden? (verhindert Meldung beim späteren Öffnen) */
+    function isFreshOrder(createdAt) {
+        var time = Date.parse(createdAt);
+        if (!isFinite(time)) {
+            return true;
+        }
+        return (Date.now() - time) <= MAX_ORDER_AGE_MINUTES * 60 * 1000;
+    }
+
     /** cfour-Format: allgemeine Seitendaten auf jeder Seite */
     var sendGlobalValues = safe("sendGlobalValues", function () {
         var items = get(store(), "state.basket.items", []);
@@ -1293,6 +1457,19 @@
         // Bestellbestätigung
         if (isEnabled("purchase") && window.BermaroTrackingOrder) {
             sendPurchase(window.BermaroTrackingOrder);
+        } else if (isEnabled("purchase") && type === "confirmation") {
+            // Sicherheitsnetz: Bestellung aus der Seite lesen (siehe rawOrderFromPage)
+            waitFor(function () {
+                return rawOrderFromPage();
+            }, function (rawOrder) {
+                var order = buildOrderFromRaw(rawOrder);
+                if (cfg.onlyOnce && !isFreshOrder(order.createdAt)) {
+                    log("Bestellung " + order.orderId + " ist älter als " + MAX_ORDER_AGE_MINUTES + " Minuten – wird nicht gemeldet.");
+                    return;
+                }
+                log("Bestellung aus der Seite gelesen", order);
+                sendPurchase(order);
+            }, 40, 250);
         }
 
         // Artikeldetailseite
