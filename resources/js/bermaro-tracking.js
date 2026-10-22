@@ -214,11 +214,28 @@
         return toNumber(price);
     }
 
+    /*
+     * Brutto- und Nettopreis eines Artikels (Sonderangebot hat Vorrang).
+     * plentyShop liefert beide Werte im Feld "data" mit – unabhängig davon, ob der Shop
+     * brutto (pelletgrill.rocks) oder netto (b2b.bermaro.de) anzeigt.
+     */
+    function grossNetPrice(doc, type) {
+        var base = "prices." + type + ".data.";
+        var gross = get(doc, base + "price", null);
+        var net = get(doc, base + "priceNet", null);
+        return { gross: gross === null ? null : toNumber(gross), net: net === null ? null : toNumber(net) };
+    }
+
     /** Artikel aus einem plentyShop-Variantendokument (Artikelseite, Kacheln, Warenkorb) */
     function productFromDocument(doc) {
         if (!doc || !doc.variation) {
             return null;
         }
+        var sale = grossNetPrice(doc, "specialOffer");
+        if (sale.gross === null) {
+            sale = grossNetPrice(doc, "default");
+        }
+        var rrp = grossNetPrice(doc, "rrp");
         return {
             variationId: get(doc, "variation.id", 0),
             itemId: get(doc, "item.id", 0),
@@ -226,6 +243,10 @@
             name: toText(get(doc, "texts.name1", "") || get(doc, "texts.name2", "") || get(doc, "texts.name3", "")),
             brand: toText(get(doc, "item.manufacturer.externalName", "") || get(doc, "item.manufacturer.name", "")),
             price: displayedPrice(doc),
+            priceGross: sale.gross,
+            priceNet: sale.net,
+            rrpGross: rrp.gross,
+            rrpNet: rrp.net,
             variant: attributeText(doc),
             category: "",
             categoryPath: [],
@@ -242,7 +263,20 @@
         };
         product.variationId = basketItem.variationId || product.variationId;
         product.itemId = basketItem.itemId || product.itemId;
-        product.price = toNumber(basketItem.price);
+        // Warenkorbpreis (berücksichtigt Staffelpreise) ist so angezeigt wie im Shop: netto (B2B) oder brutto.
+        // Den jeweils anderen Wert über das Verhältnis brutto/netto des Artikels ausrechnen.
+        var basketPrice = toNumber(basketItem.price);
+        var shownPrice = toNumber(product.price);
+        if (product.priceGross && product.priceNet) {
+            if (Math.abs(shownPrice - product.priceNet) < 0.01 && Math.abs(product.priceGross - product.priceNet) >= 0.01) {
+                product.priceGross = toNumber(basketPrice * product.priceGross / product.priceNet);
+                product.priceNet = basketPrice;
+            } else {
+                product.priceNet = toNumber(basketPrice * product.priceNet / product.priceGross);
+                product.priceGross = basketPrice;
+            }
+        }
+        product.price = basketPrice;
         product.quantity = toNumber(basketItem.quantity) || 1;
         product.basketItemId = basketItem.id;
         return product;
@@ -259,6 +293,8 @@
             price: toNumber(useNetPrices ? orderItem.priceNet : orderItem.priceGross),
             priceGross: toNumber(orderItem.priceGross),
             priceNet: toNumber(orderItem.priceNet),
+            rrpGross: null,
+            rrpNet: null,
             variant: toText(orderItem.variant),
             category: "",
             categoryPath: [],
@@ -553,15 +589,26 @@
      * "Pelletgrills Pelletsmoker > Smoker - Grills" (Abgleich mit pelletgrill.rocks, 22.10.2026).
      */
     function cfourProduct(product, extra) {
+        // Wie das bisherige Plugin (b2b.bermaro.de, 22.10.2026): "price" immer brutto, dazu "priceNet",
+        // auch wenn der Shop Nettopreise anzeigt. Der Remarketing-Tag nutzt "price" als Wert.
+        var gross = (product.priceGross !== null && product.priceGross !== undefined) ? toNumber(product.priceGross) : toNumber(product.price);
+        var net = (product.priceNet !== null && product.priceNet !== undefined) ? toNumber(product.priceNet) : gross;
+        var quantity = product.quantity || 1;
         var result = {
             id: productId(product),
+            number: toText(product.number),
             name: product.name,
             itemName: product.name,
-            price: toNumber(product.price),
+            price: gross,
+            priceNet: net,
+            amount: toNumber(gross * quantity),
+            amountNet: toNumber(net * quantity),
+            rrp: (product.rrpGross !== null && product.rrpGross !== undefined) ? toNumber(product.rrpGross) : 0,
+            rrpNet: (product.rrpNet !== null && product.rrpNet !== undefined) ? toNumber(product.rrpNet) : 0,
             brand: product.brand,
             category: (product.categoryPath && product.categoryPath.length) ? product.categoryPath.join(" > ") : categoryName(product),
             variant: product.variant,
-            quantity: product.quantity || 1
+            quantity: quantity
         };
         if (extra) {
             for (var key in extra) {
@@ -571,6 +618,16 @@
             }
         }
         return result;
+    }
+
+    /*
+     * Seitentyp im cfour-Format. Das bisherige Plugin meldet Kategorieseiten als "categoryItem";
+     * die Remarketing-Tags in GTM-TVGX67G und GTM-KVGNQMX werten genau diesen Wert aus
+     * (sonst wird die Seite als "other" statt "category" gemeldet). Feststellung 22.10.2026.
+     */
+    function cfourPageType() {
+        var type = templateType();
+        return type === "category" ? "categoryItem" : type;
     }
 
     /** Warenkorbsummen im cfour-Format */
@@ -1030,10 +1087,8 @@
         }
 
         if (USE_CFOUR) {
-            // Netto-Bestellungen (z. B. B2B): Positionspreise ebenfalls netto, passend zu den Summen
-            var cfourProducts = order.isNet ? map(order.items || [], function (item) {
-                return productFromOrderItem(item, true);
-            }) : grossProducts;
+            // Positionen wie beim bisherigen Plugin: "price" brutto, "priceNet" netto (auch bei B2B-Bestellungen)
+            var cfourProducts = grossProducts;
             push({
                 event: "orderConfirmation",
                 currency: orderCurrency,
@@ -1253,7 +1308,7 @@
             event: "globalValues",
             currency: currency(),
             lang: cfg.language || "de",
-            pageType: templateType(),
+            pageType: cfourPageType(),
             webstoreName: affiliation(),
             customerEmail: "",
             customerId: toNumber(get(store(), "state.user.userData.id", 0)),
