@@ -1,5 +1,9 @@
 # Release notes BERMARO Tracking
 
+## 1.0.4 (2026-10-22)
+
+- Main script is loaded async so it no longer waits behind slow third-party scripts; retry shortly after DOMContentLoaded.
+
 ## 1.0.3 (2026-10-22)
 
 - Self-healing loader: if the main script did not start during page load, it is re-injected up to twice after the load event.

@@ -1,5 +1,9 @@
 # Versionshinweise BERMARO Tracking
 
+## 1.0.4 (22.10.2026)
+
+- Haupt-Skript wird unabhängig (async) geladen, damit es nicht hinter langsamen Fremd-Skripten wartet; Nachladen schon kurz nach DOMContentLoaded.
+
 ## 1.0.3 (22.10.2026)
 
 - Lader selbstheilend: Startet das Haupt-Skript beim Seitenaufbau nicht, wird es nach dem Laden der Seite bis zu zweimal nachgeladen.

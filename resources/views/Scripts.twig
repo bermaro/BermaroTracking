@@ -1,11 +1,11 @@
 {# BERMARO Tracking: Bestelldaten (nur auf der Bestellbestätigung gefüllt) und Haupt-Skript #}
 <script>
     window.BermaroTrackingOrder = {{ orderJson | raw }};
-    {# Das Haupt-Skript wird per Inline-Lader eingebunden. Grund: Im Test (22.10.2026,
-       lackier-bedarf.info) wurde das Skript beim Seitenaufbau manchmal geladen, aber nicht
-       ausgeführt. Nachträglich eingefügt läuft es immer. Darum: normal laden und – falls es
-       nach dem Seitenaufbau noch nicht gestartet ist – bis zu zweimal nachladen.
-       Das Skript selbst verhindert eine doppelte Ausführung (BermaroTrackingStarted). #}
+    {# Das Haupt-Skript wird per Inline-Lader UNABHÄNGIG (async) eingebunden.
+       Grund (Test 22.10.2026, lackier-bedarf.info): Ein normaler Skript-Tag wartete hinter
+       langsamen Fremd-Skripten und startete teils erst nach über 10 Sekunden oder gar nicht.
+       Sicherheitsnetz: Ist das Skript nach dem Seitenaufbau noch nicht gestartet, wird es
+       nachgeladen. Das Skript selbst verhindert eine doppelte Ausführung (BermaroTrackingStarted). #}
     (function (window, document) {
         if (window.BermaroTrackingLoaderStarted) {
             return;
@@ -15,26 +15,34 @@
         var attempts = 0;
 
         function load() {
-            if (window.BermaroTrackingStarted || attempts >= 3) {
+            if (window.BermaroTrackingStarted || attempts >= 4) {
                 return;
             }
             attempts++;
             var script = document.createElement("script");
             script.src = attempts === 1 ? src : src + "&retry=" + attempts;
-            script.async = false;
-            (document.body || document.head || document.documentElement).appendChild(script);
+            script.async = true;
+            (document.head || document.body || document.documentElement).appendChild(script);
         }
 
-        function retryLater() {
-            window.setTimeout(load, 1000);
-            window.setTimeout(load, 4000);
+        function retry(delay) {
+            window.setTimeout(load, delay);
         }
 
         load();
-        if (document.readyState === "complete") {
-            retryLater();
+        if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", function () {
+                retry(2500);
+            });
         } else {
-            window.addEventListener("load", retryLater);
+            retry(2500);
+        }
+        if (document.readyState === "complete") {
+            retry(1000);
+        } else {
+            window.addEventListener("load", function () {
+                retry(1000);
+            });
         }
     })(window, document);
 </script>
