@@ -1,5 +1,9 @@
 # Release notes BERMARO Tracking
 
+## 1.0.7 (2026-10-22)
+
+- felixries format: search pages send the search term as "search_string" (read by the GA4 event tag in GTM).
+
 ## 1.0.6 (2026-10-22)
 
 - felixries format: sets the "consentActiveStatus" cookie exactly like the old Felix Ries plugin. The lackier-bedarf.info GTM container uses it in 13 trigger conditions (incl. Google Ads conversion).

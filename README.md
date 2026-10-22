@@ -38,7 +38,7 @@ Jeder Shop hat ein eigenes Plugin-Set (lackier-bedarf = Set 18, pelletgrill = Se
 | Container-ID | `GTM-PKMRNKBW` | `GTM-KVGNQMX` | `GTM-TVGX67G` |
 | Datenformat | nur **Felix Ries** | nur **cfour** | nur **cfour** |
 | Artikel-ID | Varianten-ID | Varianten-ID ⚠️ prüfen | Varianten-ID ⚠️ prüfen |
-| Bestellwert | wie bisher ⚠️ prüfen (Standard: Warenwert netto) | egal (cfour nutzt Warenwert brutto) | egal |
+| Bestellwert | **Warenwert brutto (ohne Versand)** – wie bisher bei Felix („Brutto“) | egal (cfour nutzt Warenwert brutto) | egal |
 | Consent Mode | Aus (Shoplytics steuert ihn) | Aus | Aus |
 | Google Analytics: Schlüssel / Gruppe | `googleanalytics` / Statistik | `gtmGoogleAnalytics` / Statistik | Eintrag **aus** (gibt es dort bisher nicht) |
 | Google Ads: Schlüssel / Gruppe | `googleads` / Marketing | `gtmGoogleAds` / Statistik | `gtmGoogleAds` / Statistik |
@@ -65,26 +65,16 @@ Die Cookie-Banner-Schlüssel gelten immer für das ganze Plugin-Set. Shops mit u
 
 > Die Menünamen in plentymarkets ändern sich gelegentlich. Wenn ein Menüpunkt anders heißt, nach dem sinngemäßen Begriff suchen.
 
-### 3.1 Zugang für plentymarkets zu GitHub anlegen (einmalig)
-1. github.com öffnen und anmelden.
-2. Oben rechts auf das Profilbild → **Settings**.
-3. Links ganz unten → **Developer settings** → **Personal access tokens** → **Fine-grained tokens** → **Generate new token**.
-4. Name: `plentymarkets`, Ablaufdatum: 1 Jahr.
-5. **Repository access** → **Only select repositories** → `BermaroTracking` auswählen.
-6. **Permissions** → **Contents** → **Read-only**.
-7. **Generate token** und den Schlüssel kopieren. Er wird nur einmal angezeigt. **Nicht** per Mail oder Chat weitergeben, nur in plentymarkets eintragen.
+### 3.1 / 3.2 Plugin in plentymarkets bekannt machen (erledigt am 22.10.2026)
+Das Repository `https://github.com/bermaro/BermaroTracking` ist **öffentlich**, deshalb braucht plentymarkets keinen Zugangsschlüssel. Es ist unter **Plugins » Git** mit Branch `main` eingetragen.
+Es enthält keine Passwörter oder Schlüssel – nur Programmcode. Container-IDs u. Ä. stehen nur in der Plugin-Konfiguration in plentymarkets.
 
-### 3.2 Plugin in plentymarkets bekannt machen
-1. plentymarkets öffnen → **Plugins » Git**.
-2. **Neues Plugin** (bzw. „+ Hinzufügen“).
-3. Remote-URL: `https://github.com/bermaro/BermaroTracking.git`
-4. Benutzername: `bermaro`; Passwort: den Schlüssel aus 3.1.
-5. Branch: `main` → **Speichern**.
+**Updates:** Seit „Plugin Build 2“ zieht plentymarkets bei **jedem Bereitstellen** automatisch den neuesten Stand von `main`. Eine neue Version ist also aktiv, sobald das Plugin-Set bereitgestellt wird.
 
 ### 3.3 Testen in einer Kopie des Plugin-Sets (NICHT im Live-Set)
 1. **Plugins » Plugin-Set-Übersicht**.
-2. Beim Plugin-Set von lackier-bedarf.info (Set 18) auf **Kopieren** klicken → Name: `18 TEST BermaroTracking`.
-3. Die Kopie öffnen → **Plugin hinzufügen** → Quelle **Git** → **BermaroTracking** → **Installieren**.
+2. Test-Set für lackier-bedarf.info: **Set 44 „B2C Sicherung 02.10.2026 V3“** (eingerichtet am 22.10.2026; ein weiteres Kopieren ist wegen der Plugin-Set-Grenze des Tarifs nicht möglich).
+3. Das Test-Set öffnen → **Plugin hinzufügen** → Quelle **Git** → **BermaroTracking** → **Installieren**.
 4. In der Kopie das Plugin **„Google Tag Manager by felixries.de“ deaktivieren** (nicht löschen).
 5. Auf **BermaroTracking** klicken → Einstellungen laut Tabelle in Abschnitt 2 eintragen → zusätzlich **Testmodus** anhaken → **Speichern**.
 6. Reiter **Container-Verknüpfungen**: Prüfen, ob die drei Einträge verknüpft sind:
@@ -93,7 +83,7 @@ Die Cookie-Banner-Schlüssel gelten immer für das ganze Plugin-Set. Shops mit u
    - „BERMARO Tracking: E-Commerce-Ereignisse“ → *Script loader: After scripts loaded*
    Falls nicht: die Verknüpfungen setzen, oder in der Plugin-Set-Ansicht **„Standard-Container-Verknüpfungen“** aktivieren.
 7. Plugin-Set **bereitstellen** (Deploy / Plugin-Set aktualisieren).
-8. Die Kopie im Shop **in der Vorschau** öffnen, ohne sie dem Mandanten zuzuweisen (Plugin-Set-Übersicht → Vorschau-Symbol).
+8. Das Test-Set im Shop **in der Vorschau** öffnen, ohne es dem Mandanten zuzuweisen: im Plugin-Set oben auf das **Auge-Symbol** → **Bermaro B2C** (= lackier-bedarf.info). Unten links erscheint der Kasten „plentyShop LTS Vorschau“. Die Vorschau gilt nur für den eigenen Browser; zum Beenden dort den Schalter ausschalten.
 
 ### 3.4 Prüfliste für den Test (mit Stefan oder Shoplytics)
 1. Tag Manager → Container `GTM-PKMRNKBW` → **Vorschau** → Shop-Vorschau-URL eingeben.
@@ -119,10 +109,11 @@ Im Plugin-Set **BermaroTracking deaktivieren**, **Felix-Ries-Plugin wieder aktiv
 
 ## 4. Offene Punkte vor dem Live-Gang
 
-1. **Bestellwert `orderValue`** (lackier-bedarf): Welcher Betrag war beim Felix-Ries-Plugin eingestellt? Nachsehen im Plugin-Set 18 → Felix-Ries-Plugin → Konfiguration → Feld zum Umsatz/Bestellwert (netto/brutto, mit/ohne Versand). Dieselbe Auswahl in BermaroTracking unter **Bestellung → Bestellwert** treffen.
+1. ~~Bestellwert `orderValue`~~ – **geklärt:** Felix-Ries war auf „Brutto“ eingestellt → in BermaroTracking **Warenwert brutto (ohne Versand)**. Im Test-Set 44 so eingetragen.
 2. **Artikel-ID pelletgrill/B2B**: Muss zur ID im Google-Shopping-Feed des jeweiligen Shops passen (Varianten-ID, Artikel-ID oder Variantennummer). Mit Stefan klären.
 3. **Warenwert mit Rabatt/Gutschein:** Das Plugin berechnet den Warenwert aus den tatsächlich berechneten Positionspreisen und zieht Aktionsgutscheine ab. Bei der Testbestellung einmal **mit Gutschein** bestellen und den Wert mit der Bestellung in plentymarkets vergleichen.
-4. **B2B-Container `GTM-TVGX67G`** nutzt noch Universal-Analytics-Tags. Universal Analytics wurde von Google 2024 abgeschaltet, dort kommen also keine Analytics-Daten mehr an. Das hat mit dem Plugin nichts zu tun, sollte aber mit Stefan besprochen werden.
+4. **Cookie `consentActiveStatus`** (nur lackier-bedarf): Der Container GTM-PKMRNKBW wertet bei 13 Auslösern (u. a. Google-Ads-Conversion) dieses Cookie aus, das bisher das Felix-Plugin setzte. BermaroTracking setzt es ab 1.0.6 identisch. Bei pelletgrill/B2B vor dem Umstieg prüfen, ob deren Container ähnliche Cookies des alten Plugins auswerten.
+5. **B2B-Container `GTM-TVGX67G`** nutzt noch Universal-Analytics-Tags. Universal Analytics wurde von Google 2024 abgeschaltet, dort kommen also keine Analytics-Daten mehr an. Das hat mit dem Plugin nichts zu tun, sollte aber mit Stefan besprochen werden.
 
 ---
 
@@ -143,4 +134,22 @@ BermaroTracking/
 └── resources/lang/de|en/*.properties   Texte (deutsch/englisch)
 ```
 
-Versionsstand: 1.0.0 (22.10.2026)
+## 6. Testergebnisse (22.10.2026, Test-Set 44, Vorschau lackier-bedarf.info)
+
+| Prüfung | Ergebnis |
+|---|---|
+| Bereitstellung / PHP-Prüfung von plentymarkets | ✅ (ab 1.0.1) |
+| Tag Manager `GTM-PKMRNKBW` wird genau **einmal** geladen | ✅ |
+| Seitenaufruf `facebookEvent / PageView` | ✅ |
+| Kategorieseite `Produktimpression` (Preis = angezeigter Preis) | ✅ |
+| Artikelseite `Produktdetailseite` | ✅ |
+| In den Warenkorb `addToCart` (genau einmal) | ✅ |
+| Warenkorbseite `Warenkorb` | ✅ |
+| Shoplytics-Ereignisse laufen unverändert weiter | ✅ |
+| Vergleich mit Live-Shop (altes Felix-Plugin), Kategorie „Staubsaugen“ | ✅ identisch (gleiche 12 Artikel, gleiche Felder) |
+| Cookie `consentActiveStatus` (wird vom Tag Manager für 13 Auslöser gebraucht) | ✅ Zeichen für Zeichen wie beim alten Plugin (ab 1.0.6) |
+| Bestellbestätigung | ⏳ nur mit echter Testbestellung prüfbar |
+
+Abgleich mit dem Tag-Manager-Container GTM-PKMRNKBW (22.10.2026): Alle Felder, die Tags oder Auslöser tatsächlich verwenden, liefert das Plugin. Weitere vom alten Plugin bekannte Felder (z. B. `addCartName`, `visitorId`, `customerHash`, `categoryId`) werden im Container von keinem Tag benutzt.
+
+Versionsstand: 1.0.7 (22.10.2026)

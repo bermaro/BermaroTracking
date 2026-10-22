@@ -1,5 +1,9 @@
 # Versionshinweise BERMARO Tracking
 
+## 1.0.7 (22.10.2026)
+
+- Felix-Format: Auf Suchseiten wird der Suchbegriff als "search_string" mitgesendet (wird im Tag Manager vom GA4-Ereignis-Tag gelesen).
+
 ## 1.0.6 (22.10.2026)
 
 - Felix-Format: Cookie "consentActiveStatus" wird wie beim alten Felix-Ries-Plugin gesetzt. Der Tag-Manager-Container von lackier-bedarf.info prüft damit vor 13 Auslösern (u. a. Google-Ads-Conversion) die Einwilligung – ohne das Cookie würden diese Tags bei neuen Besuchern nicht feuern.
