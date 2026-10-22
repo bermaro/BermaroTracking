@@ -95,8 +95,17 @@ class ScriptContainer
         }
 
         // Genau die Bestellung, die plentyShop auf dieser Seite anzeigt
+        // (je nach plentyShop-Version unter "data", "order" oder "orderData")
         $templateData = TemplateService::$currentTemplateData;
-        $localizedOrder = (is_array($templateData) && isset($templateData['data'])) ? $templateData['data'] : null;
+        $localizedOrder = null;
+        if (is_array($templateData)) {
+            foreach (['data', 'order', 'orderData'] as $key) {
+                if (!empty($templateData[$key])) {
+                    $localizedOrder = $templateData[$key];
+                    break;
+                }
+            }
+        }
         if (empty($localizedOrder)) {
             return null;
         }
