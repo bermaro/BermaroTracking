@@ -189,15 +189,30 @@ class OrderDataBuilder
      */
     private function toArray($localizedOrder)
     {
+        $array = null;
         if (is_array($localizedOrder)) {
-            return $localizedOrder;
-        }
-        // Hinweis: method_exists() ist in plentymarkets-Plugins verboten, daher instanceof.
-        if ($localizedOrder instanceof LocalizedOrder) {
+            $array = $localizedOrder;
+        } elseif ($localizedOrder instanceof LocalizedOrder) {
+            // Hinweis: method_exists() ist in plentymarkets-Plugins verboten, daher instanceof.
             $array = $localizedOrder->toArray();
-            return is_array($array) ? $array : null;
+        } elseif (is_object($localizedOrder)) {
+            // Andere Objekte (z. B. die rohe Bestellung) über JSON in ein Array umwandeln
+            $decoded = json_decode(json_encode($localizedOrder), true);
+            $array = is_array($decoded) ? $decoded : null;
         }
-        return null;
+        if (!is_array($array)) {
+            return null;
+        }
+
+        /*
+         * Auf der ShopBuilder-Bestellbestätigung übergibt plentyShop teils die ROHE Bestellung
+         * (id, orderItems, amounts ...) statt der aufbereiteten Form ['order' => ..., 'totals' => ...].
+         * (Festgestellt am 22.10.2026 auf lackier-bedarf.info.) Beide Formen werden unterstützt.
+         */
+        if (!isset($array['order']) && isset($array['id']) && isset($array['orderItems'])) {
+            $array = ['order' => $array];
+        }
+        return $array;
     }
 
     /**

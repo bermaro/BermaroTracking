@@ -1,5 +1,9 @@
 # Versionshinweise BERMARO Tracking
 
+## 1.0.8 (22.10.2026)
+
+- Bestellbestätigung (ShopBuilder): plentyShop übergibt dort teils die rohe Bestellung. Das Plugin erkennt jetzt beide Formen auf dem Server und liest die Bestellung zusätzlich als Sicherheitsnetz direkt aus der Seite (höchstens 60 Minuten alte Bestellungen, jede nur einmal).
+
 ## 1.0.7 (22.10.2026)
 
 - Felix-Format: Auf Suchseiten wird der Suchbegriff als "search_string" mitgesendet (wird im Tag Manager vom GA4-Ereignis-Tag gelesen).

@@ -1,5 +1,9 @@
 # Release notes BERMARO Tracking
 
+## 1.0.8 (2026-10-22)
+
+- Order confirmation (ShopBuilder): supports the raw order format on the server and, as a fallback, reads the order from the page (max. 60 minutes old, reported once).
+
 ## 1.0.7 (2026-10-22)
 
 - felixries format: search pages send the search term as "search_string" (read by the GA4 event tag in GTM).

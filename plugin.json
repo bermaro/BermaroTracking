@@ -3,7 +3,7 @@
     "namespace"         : "BermaroTracking",
     "marketplaceName"   : {"de": "BERMARO Tracking (Google Tag Manager)", "en": "BERMARO Tracking (Google Tag Manager)"},
     "type"              : "template",
-    "version"           : "1.0.7",
+    "version"           : "1.0.8",
     "license"           : "Proprietary",
     "price"             : 0.00,
     "description"       : "Mandantenfähige Anbindung des Google Tag Managers für plentyShop LTS. Ersetzt das nicht mehr gepflegte GTM-Plugin von felixries.de und das bisherige GTM-Plugin auf pelletgrill.rocks / b2b.bermaro.de, wahlweise im jeweils bisherigen Datenformat.",
