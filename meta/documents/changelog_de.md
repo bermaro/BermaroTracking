@@ -1,5 +1,10 @@
 # Versionshinweise BERMARO Tracking
 
+## 1.0.13 (22.10.2026)
+
+- Google Consent Mode "Advanced" meldet Google jetzt zuverlässig den echten Einwilligungsstand aus dem plentyShop-Cookie-Banner. Sendet ein anderes Skript (z. B. Shoplytics) danach "denied", wird sofort der echte Stand hinterhergeschickt. Hintergrund: Auf lackier-bedarf.info gingen Käufe und Google-Ads-Conversions sonst trotz Zustimmung "ohne Cookies" (gcs=G100) raus.
+- Beschriftung der Consent-Mode-Einstellung angepasst ("Advanced" ist bei Shoplytics die empfohlene Wahl).
+
 ## 1.0.12 (22.10.2026)
 
 - Währung immer als ISO-Code ("EUR" statt "€"). pelletgrill.rocks und b2b.bermaro.de liefern im Shop das Zeichen "€"; Google Analytics 4 und Google Ads brauchen "EUR" (das bisherige Plugin sendete ebenfalls "EUR").

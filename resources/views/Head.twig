@@ -75,8 +75,14 @@
             }
         }
 
-        /* Consent Mode: Einwilligung an Google melden (nur wenn eingeschaltet) */
-        function updateConsent() {
+        /* Das zuletzt von UNS gesendete consent-update (um fremde Updates zu erkennen) */
+        var ownConsentEntry = null;
+        var pushingOwnConsent = false;
+
+        /* Consent Mode: Einwilligung an Google melden (nur wenn eingeschaltet).
+           force = true: auch senden, wenn sich unser Stand nicht geändert hat
+           (nötig, wenn ein anderes Skript – z. B. Shoplytics – danach "denied" gesendet hat). */
+        function updateConsent(force) {
             if (!useConsentMode) {
                 return;
             }
@@ -85,11 +91,63 @@
                 return;
             }
             var key = JSON.stringify(state);
-            if (key === lastConsentState) {
+            if (key === lastConsentState && force !== true) {
                 return;
             }
             lastConsentState = key;
-            gtag("consent", "update", state);
+            pushingOwnConsent = true;
+            try {
+                gtag("consent", "update", state);
+                ownConsentEntry = dataLayer[dataLayer.length - 1];
+            } finally {
+                pushingOwnConsent = false;
+            }
+        }
+
+        /* Ist dieser dataLayer-Eintrag ein consent-update? */
+        function isConsentUpdate(entry) {
+            return !!(entry && typeof entry === "object" && typeof entry.length === "number" &&
+                entry[0] === "consent" && entry[1] === "update");
+        }
+
+        /*
+         * Fremde consent-updates überstimmen (Stand 22.10.2026):
+         * Shoplytics sendet auf lackier-bedarf.info "consent update: denied", weil es die
+         * plentyShop-Einwilligung nicht erkennt (das Cookie ist URL-kodiert gespeichert).
+         * Ohne Korrektur gingen Käufe und Ads-Conversions "ohne Cookies" (gcs=G100) raus,
+         * obwohl der Besucher im Cookie-Banner zugestimmt hat. Wir melden deshalb direkt danach
+         * den ECHTEN Stand aus dem plentyShop-Cookie-Banner erneut (granted ODER denied).
+         */
+        function reassertConsentIfForeign() {
+            if (!useConsentMode) {
+                return;
+            }
+            for (var i = dataLayer.length - 1; i >= 0; i--) {
+                if (isConsentUpdate(dataLayer[i])) {
+                    if (dataLayer[i] !== ownConsentEntry) {
+                        updateConsent(true);
+                    }
+                    return;
+                }
+            }
+        }
+
+        /* dataLayer.push "umwickeln": sobald ein anderes Skript ein consent-update sendet,
+           sofort den echten Stand hinterher schicken (vor allen folgenden Ereignissen). */
+        if (useConsentMode && typeof dataLayer.push === "function") {
+            var originalPush = dataLayer.push;
+            dataLayer.push = function () {
+                var result = originalPush.apply(dataLayer, arguments);
+                if (!pushingOwnConsent) {
+                    for (var a = 0; a < arguments.length; a++) {
+                        if (isConsentUpdate(arguments[a])) {
+                            updateConsent(true);
+                            break;
+                        }
+                    }
+                }
+                return result;
+            };
         }
 
         /* Den Tag Manager selbst laden (nur einmal) */
@@ -202,8 +260,23 @@
                 lastConsentSnapshot = consentSnapshot();
             }
             updateConsent();
+            reassertConsentIfForeign();
             tryLoadGtm();
         });
+
+        /* Sicherheitsnetz, falls ein anderes Skript dataLayer.push ersetzt hat:
+           in den ersten 20 Sekunden regelmäßig prüfen, ob das letzte consent-update von uns stammt. */
+        if (useConsentMode) {
+            var checks = 0;
+            var checkTimer = window.setInterval(function () {
+                checks++;
+                reassertConsentIfForeign();
+                if (checks >= 40) {
+                    window.clearInterval(checkTimer);
+                }
+            }, 500);
+            window.addEventListener("load", reassertConsentIfForeign);
+        }
 
         tryLoadGtm();
     })(window, document);

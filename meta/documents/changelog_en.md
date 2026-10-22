@@ -1,5 +1,10 @@
 # Release notes BERMARO Tracking
 
+## 1.0.13 (2026-10-22)
+
+- Google Consent Mode "Advanced" now reliably reports the real consent state from the plentyShop cookie bar. If another script (e.g. Shoplytics) sends "denied" afterwards, the real state is re-sent immediately (purchases and Google Ads conversions were otherwise sent cookieless, gcs=G100, despite consent).
+- Consent mode setting labels updated ("Advanced" is recommended with Shoplytics).
+
 ## 1.0.12 (2026-10-22)
 
 - Currency is always sent as ISO code ("EUR" instead of "€"), as required by GA4 / Google Ads and as sent by the previous plugin.

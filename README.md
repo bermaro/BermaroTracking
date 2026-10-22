@@ -5,6 +5,12 @@ Eigenes Plugin der BERMARO GmbH. Es ersetzt
 - auf **lackier-bedarf.info** das nicht mehr gepflegte Plugin „Google Tag Manager by felixries.de“ (Version 1.3.2),
 - auf **pelletgrill.rocks** und **b2b.bermaro.de** das bisherige Tag-Manager-Plugin (Datenformat „globalValues / singleItemView / orderConfirmation“).
 
+**Live seit 22.10.2026 (ca. 20:30–21:00 Uhr) in allen drei Shops** – zuerst Version 1.0.12, Testmodus aus; ab 1.0.13 mit Consent-Korrektur (siehe unten). Live-Plugin-Sets: lackier-bedarf = Set 18 „b2c Ceres ab 1.7.2020 BR“, pelletgrill = Set 22 „Pelletgrill.rocks 17.7.2020“, B2B = Set 23 „b2b.bermaro.de 20.7.2020“. Die alten Plugins sind dort nur **deaktiviert** (nicht gelöscht). Nach dem Live-Gang geprüft: Tag Manager je Shop genau einmal geladen, Ereignisse im Live-Shop korrekt (lackier: Liste, Warenkorb hinzufügen/entfernen, Shoplytics läuft; pelletgrill/B2B: `categoryItem`, `EUR`, Brutto-/Nettopreise). Shoplytics und Stefan Kaltenecker wurden am 22.10.2026 per E-Mail informiert.
+
+**Gutschein-Testbestellung 22.10.2026 (lackier-bedarf.info, Auftrag 331025, wird storniert):** 1 × MIRKA Schleifteller 104,14 €, Aktionsgutschein 22NLMA (Kampagne 11) −5,00 €, Versand 0 €. dataLayer: `orderValue`/`revenue` = **99,14 €** (Warenwert brutto **nach** Gutschein), netto 83,31 €, MwSt. 15,83 €, `coupon` = 22NLMA, Auftrags-ID 331025 – stimmt mit plentymarkets überein. GA4 `purchase` (99,14 €, transaction_id 331025) und Google-Ads-Conversion (99,14 € EUR) wurden gesendet.
+Dabei gefunden: Beide Treffer gingen mit `gcs=G100` raus, also „Einwilligung verweigert“, obwohl im Cookie-Banner zugestimmt war. Ursache: Shoplytics sendet `consent update: denied`, weil es die Einwilligung im (URL-kodierten) Cookie `plenty-shop-cookie` nicht findet. Lösung ab **1.0.13**: Consent Mode auf lackier-bedarf.info = **Advanced**; das Plugin schickt nach jedem fremden consent-update sofort den echten Stand aus dem Cookie-Banner hinterher.
+Hinweis Kampagne 34 („Gutschein-KA ab 100€ Neue Codes“, Uptain): Codes 222QNS und 222RDQ wurden im Shop als „bereits verwendet oder ungültig“ abgelehnt, obwohl im Backend „aktiv“ – Einstellungen (Mandant Standard, Kundenklassen, Kategorien) sahen unauffällig aus; Ursache nicht abschließend geklärt.
+
 Der Tag Manager selbst und die Einstellungen darin (Tags, Trigger, Shoplytics) bleiben **unverändert**. Das Plugin liefert die Daten im jeweils bisherigen Format. Deshalb muss im Tag Manager nichts umgebaut werden.
 
 ---
@@ -41,7 +47,7 @@ Test-Sets (Kopien, nicht live; „Sicherung“ = Kopie des Live-Sets vom 29.09.2
 | Datenformat | nur **Felix Ries** | nur **cfour** | nur **cfour** |
 | Artikel-ID | Varianten-ID | Varianten-ID (= wie altes Plugin, geprüft) | Varianten-ID (= wie altes Plugin, geprüft) |
 | Bestellwert | **Warenwert brutto (ohne Versand)** – wie bisher bei Felix („Brutto“) | egal (cfour nutzt Warenwert brutto) | egal |
-| Consent Mode | Aus (Shoplytics steuert ihn) | Aus | Aus |
+| Consent Mode | **Advanced** (ab 1.0.13; korrigiert das „denied“ von Shoplytics) | Aus | Aus |
 | Google Analytics: Schlüssel / Gruppe | `googleanalytics` / Statistik | `gtmGoogleAnalytics` / Statistik | `gtmGoogleAnalytics` / Statistik (Eintrag gibt es im Live-Shop bereits) |
 | Google Ads: Schlüssel / Gruppe | `googleads` / Marketing | `gtmGoogleAds` / Statistik | `gtmGoogleAds` / Statistik |
 | Bing: Schlüssel / Gruppe | `bingads` / Statistik | Eintrag **aus** | Eintrag **aus** |
