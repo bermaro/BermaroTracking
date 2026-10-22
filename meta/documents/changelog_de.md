@@ -1,5 +1,9 @@
 # Versionshinweise BERMARO Tracking
 
+## 1.0.9 (22.10.2026)
+
+- cfour-Format (pelletgrill.rocks, B2B): Kategorie als vollständiger Pfad ("A > B"), Listenname "Kategorieliste: …, Seite: n" und Position ab 1 – wie beim bisherigen Plugin (Abgleich mit dem Live-Shop).
+
 ## 1.0.8 (22.10.2026)
 
 - Bestellbestätigung (ShopBuilder): plentyShop übergibt dort teils die rohe Bestellung. Das Plugin erkennt jetzt beide Formen auf dem Server und liest die Bestellung zusätzlich als Sicherheitsnetz direkt aus der Seite (höchstens 60 Minuten alte Bestellungen, jede nur einmal).

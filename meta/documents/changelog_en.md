@@ -1,5 +1,9 @@
 # Release notes BERMARO Tracking
 
+## 1.0.9 (2026-10-22)
+
+- cfour format: full category path ("A > B"), list name "Kategorieliste: …, Seite: n" and 1-based positions, matching the previous plugin.
+
 ## 1.0.8 (2026-10-22)
 
 - Order confirmation (ShopBuilder): supports the raw order format on the server and, as a fallback, reads the order from the page (max. 60 minutes old, reported once).
