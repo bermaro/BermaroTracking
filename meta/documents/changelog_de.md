@@ -1,5 +1,9 @@
 # Versionshinweise BERMARO Tracking
 
+## 1.0.12 (22.10.2026)
+
+- Währung immer als ISO-Code ("EUR" statt "€"). pelletgrill.rocks und b2b.bermaro.de liefern im Shop das Zeichen "€"; Google Analytics 4 und Google Ads brauchen "EUR" (das bisherige Plugin sendete ebenfalls "EUR").
+
 ## 1.0.11 (22.10.2026)
 
 - cfour-Format (pelletgrill.rocks, B2B), Abgleich mit dem bisherigen Plugin im Live-Shop b2b.bermaro.de:

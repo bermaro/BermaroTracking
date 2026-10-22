@@ -1,5 +1,9 @@
 # Release notes BERMARO Tracking
 
+## 1.0.12 (2026-10-22)
+
+- Currency is always sent as ISO code ("EUR" instead of "€"), as required by GA4 / Google Ads and as sent by the previous plugin.
+
 ## 1.0.11 (2026-10-22)
 
 - cfour format: category pages report pageType "categoryItem" (used by the Google Ads remarketing tag); items always send gross "price" plus "priceNet", "amount", "amountNet", "rrp", "rrpNet" and "number", matching the previous plugin.
