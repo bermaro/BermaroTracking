@@ -1,17 +1,40 @@
 {# BERMARO Tracking: Bestelldaten (nur auf der Bestellbestätigung gefüllt) und Haupt-Skript #}
 <script>
     window.BermaroTrackingOrder = {{ orderJson | raw }};
-    {# Das Haupt-Skript wird per Inline-Lader eingebunden. Grund: plentyShop führt externe
-       <script src>-Tags in diesem Container beim Seitenaufbau nicht zuverlässig aus,
-       Inline-Code dagegen schon (getestet 22.10.2026 auf lackier-bedarf.info). #}
-    (function (document) {
-        if (window.BermaroTrackingStarted || window.BermaroTrackingLoaderStarted) {
+    {# Das Haupt-Skript wird per Inline-Lader eingebunden. Grund: Im Test (22.10.2026,
+       lackier-bedarf.info) wurde das Skript beim Seitenaufbau manchmal geladen, aber nicht
+       ausgeführt. Nachträglich eingefügt läuft es immer. Darum: normal laden und – falls es
+       nach dem Seitenaufbau noch nicht gestartet ist – bis zu zweimal nachladen.
+       Das Skript selbst verhindert eine doppelte Ausführung (BermaroTrackingStarted). #}
+    (function (window, document) {
+        if (window.BermaroTrackingLoaderStarted) {
             return;
         }
         window.BermaroTrackingLoaderStarted = true;
-        var script = document.createElement("script");
-        script.src = {{ (plugin_path('BermaroTracking') ~ '/js/bermaro-tracking.js?v=' ~ version) | json_encode | raw }};
-        script.async = false;
-        (document.body || document.head || document.documentElement).appendChild(script);
-    })(document);
+        var src = {{ (plugin_path('BermaroTracking') ~ '/js/bermaro-tracking.js?v=' ~ version) | json_encode | raw }};
+        var attempts = 0;
+
+        function load() {
+            if (window.BermaroTrackingStarted || attempts >= 3) {
+                return;
+            }
+            attempts++;
+            var script = document.createElement("script");
+            script.src = attempts === 1 ? src : src + "&retry=" + attempts;
+            script.async = false;
+            (document.body || document.head || document.documentElement).appendChild(script);
+        }
+
+        function retryLater() {
+            window.setTimeout(load, 1000);
+            window.setTimeout(load, 4000);
+        }
+
+        load();
+        if (document.readyState === "complete") {
+            retryLater();
+        } else {
+            window.addEventListener("load", retryLater);
+        }
+    })(window, document);
 </script>

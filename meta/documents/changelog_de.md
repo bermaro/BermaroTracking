@@ -1,5 +1,9 @@
 # Versionshinweise BERMARO Tracking
 
+## 1.0.3 (22.10.2026)
+
+- Lader selbstheilend: Startet das Haupt-Skript beim Seitenaufbau nicht, wird es nach dem Laden der Seite bis zu zweimal nachgeladen.
+
 ## 1.0.2 (22.10.2026)
 
 - Korrektur: Haupt-Skript wird jetzt per Inline-Lader eingebunden, weil plentyShop externe Skript-Tags im Container "Script.AfterScriptsLoaded" beim Seitenaufbau nicht ausführte.
