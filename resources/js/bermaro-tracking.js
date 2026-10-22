@@ -324,6 +324,22 @@
         return toText(get(category, "details.0.name", ""));
     }
 
+    /** Suchbegriff der Suchseite (aus plentyShop oder aus der Adresse ?query=...) */
+    function searchTerm() {
+        var term = toText(get(store(), "state.itemList.searchString", ""));
+        if (!term) {
+            var match = /[?&]query=([^&#]*)/.exec(window.location.search || "");
+            if (match) {
+                try {
+                    term = decodeURIComponent(match[1].replace(/\+/g, " "));
+                } catch (error) {
+                    term = match[1];
+                }
+            }
+        }
+        return term.trim();
+    }
+
     /** Name der Artikelliste (Felix-Format: "Lackieren >> Zubehör") */
     function listName() {
         if (templateType() === "search") {
@@ -601,6 +617,17 @@
         });
 
         if (USE_FELIX) {
+            var felixExtra = {
+                google_tag_params: {
+                    ecomm_prodid: map(products, productIdValue),
+                    ecomm_pagetype: remarketingPageType(),
+                    ecomm_category: path.join("/")
+                }
+            };
+            // Suchbegriff: wird im Tag Manager (GA4-Ereignis-Tag) als "search_string" gelesen
+            if (templateType() === "search") {
+                felixExtra.search_string = searchTerm();
+            }
             felixEvent("view_item_list", "Produktimpression", templateType() === "search" ? "Suche" : "Kategorie", {
                 currencyCode: currency(),
                 impressions: map(products, function (product, index) {
@@ -609,13 +636,7 @@
                     result.list = list;
                     return result;
                 })
-            }, products, {
-                google_tag_params: {
-                    ecomm_prodid: map(products, productIdValue),
-                    ecomm_pagetype: remarketingPageType(),
-                    ecomm_category: path.join("/")
-                }
-            });
+            }, products, felixExtra);
         }
         if (USE_CFOUR) {
             push({
