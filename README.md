@@ -33,14 +33,16 @@ Ein Fehler im Plugin legt den Shop nie lahm: Jede Funktion ist abgesichert. Im F
 
 Jeder Shop hat ein eigenes Plugin-Set (lackier-bedarf = Set 18, pelletgrill = Set 22, B2B = Set 23). Die Einstellungen werden pro Plugin-Set gespeichert.
 
+Test-Sets (Kopien, nicht live; „Sicherung“ = Kopie des Live-Sets vom 29.09.2026): lackier-bedarf = Set 44, pelletgrill = Set 40 („Pelletgrill Sicherung 29.09.26“), B2B = Set 41 („B2B Sicherung 29.09.2026“). In Set 40 und 41 ist BermaroTracking aktiv und „Google Tag Manager Tracking ENTERPRISE“ deaktiviert.
+
 | Einstellung | lackier-bedarf.info | pelletgrill.rocks | b2b.bermaro.de |
 |---|---|---|---|
 | Container-ID | `GTM-PKMRNKBW` | `GTM-KVGNQMX` | `GTM-TVGX67G` |
 | Datenformat | nur **Felix Ries** | nur **cfour** | nur **cfour** |
-| Artikel-ID | Varianten-ID | Varianten-ID ⚠️ prüfen | Varianten-ID ⚠️ prüfen |
+| Artikel-ID | Varianten-ID | Varianten-ID (= wie altes Plugin, geprüft) | Varianten-ID (= wie altes Plugin, geprüft) |
 | Bestellwert | **Warenwert brutto (ohne Versand)** – wie bisher bei Felix („Brutto“) | egal (cfour nutzt Warenwert brutto) | egal |
 | Consent Mode | Aus (Shoplytics steuert ihn) | Aus | Aus |
-| Google Analytics: Schlüssel / Gruppe | `googleanalytics` / Statistik | `gtmGoogleAnalytics` / Statistik | Eintrag **aus** (gibt es dort bisher nicht) |
+| Google Analytics: Schlüssel / Gruppe | `googleanalytics` / Statistik | `gtmGoogleAnalytics` / Statistik | `gtmGoogleAnalytics` / Statistik (Eintrag gibt es im Live-Shop bereits) |
 | Google Ads: Schlüssel / Gruppe | `googleads` / Marketing | `gtmGoogleAds` / Statistik | `gtmGoogleAds` / Statistik |
 | Bing: Schlüssel / Gruppe | `bingads` / Statistik | Eintrag **aus** | Eintrag **aus** |
 
@@ -102,17 +104,19 @@ Es enthält keine Passwörter oder Schlüssel – nur Programmcode. Container-ID
 2. Shoplytics (support@shoplytics.de) Bescheid geben, damit sie das Tracking prüfen.
 3. Erst nach 2 Wochen ohne Auffälligkeiten das Felix-Ries-Abo kündigen (marketplace.plentymarkets.com → Mein Konto → Verträge).
 
+**pelletgrill.rocks / b2b.bermaro.de:** genauso, nur statt des Felix-Ries-Plugins das Plugin **„Google Tag Manager Tracking ENTERPRISE“** deaktivieren (nicht löschen). Einstellungen laut Tabelle in Abschnitt 2. In den Test-Sets 40 und 41 ist das bereits so eingerichtet und kann als Vorlage dienen.
+
 ### 3.6 Zurück zum alten Stand (Notfall)
-Im Plugin-Set **BermaroTracking deaktivieren**, **Felix-Ries-Plugin wieder aktivieren**, bereitstellen. Dauer: etwa 5 Minuten.
+Im Plugin-Set **BermaroTracking deaktivieren**, das alte Plugin (lackier: „Google Tag Manager by felixries.de“, pelletgrill/B2B: „Google Tag Manager Tracking ENTERPRISE“) **wieder aktivieren**, bereitstellen. Dauer: etwa 8 Minuten.
 
 ---
 
 ## 4. Offene Punkte vor dem Live-Gang
 
 1. ~~Bestellwert `orderValue`~~ – **geklärt:** Felix-Ries war auf „Brutto“ eingestellt → in BermaroTracking **Warenwert brutto (ohne Versand)**. Im Test-Set 44 so eingetragen.
-2. **Artikel-ID pelletgrill/B2B**: Muss zur ID im Google-Shopping-Feed des jeweiligen Shops passen (Varianten-ID, Artikel-ID oder Variantennummer). Mit Stefan klären.
+2. ~~Artikel-ID pelletgrill/B2B~~ – **geklärt:** Das alte Plugin sendet dieselbe ID wie die Einstellung „Varianten-ID“ (z. B. 22869 auf B2B, 22547 auf pelletgrill; Abgleich mit dem Live-Shop am 22.10.2026).
 3. **Warenwert mit Rabatt/Gutschein:** Das Plugin berechnet den Warenwert aus den tatsächlich berechneten Positionspreisen und zieht Aktionsgutscheine ab. Bei der Testbestellung einmal **mit Gutschein** bestellen und den Wert mit der Bestellung in plentymarkets vergleichen.
-4. **Cookie `consentActiveStatus`** (nur lackier-bedarf): Der Container GTM-PKMRNKBW wertet bei 13 Auslösern (u. a. Google-Ads-Conversion) dieses Cookie aus, das bisher das Felix-Plugin setzte. BermaroTracking setzt es ab 1.0.6 identisch. Bei pelletgrill/B2B vor dem Umstieg prüfen, ob deren Container ähnliche Cookies des alten Plugins auswerten.
+4. **Cookie `consentActiveStatus`** (nur lackier-bedarf): Der Container GTM-PKMRNKBW wertet bei 13 Auslösern (u. a. Google-Ads-Conversion) dieses Cookie aus, das bisher das Felix-Plugin setzte. BermaroTracking setzt es ab 1.0.6 identisch. Die Container von pelletgrill (GTM-KVGNQMX) und B2B (GTM-TVGX67G) wurden am 22.10.2026 geprüft: Sie werten kein Cookie des alten Plugins aus.
 5. **B2B-Container `GTM-TVGX67G`** nutzt noch Universal-Analytics-Tags. Universal Analytics wurde von Google 2024 abgeschaltet, dort kommen also keine Analytics-Daten mehr an. Das hat mit dem Plugin nichts zu tun, sollte aber mit Stefan besprochen werden.
 
 ---
@@ -148,8 +152,59 @@ BermaroTracking/
 | Shoplytics-Ereignisse laufen unverändert weiter | ✅ |
 | Vergleich mit Live-Shop (altes Felix-Plugin), Kategorie „Staubsaugen“ | ✅ identisch (gleiche 12 Artikel, gleiche Felder) |
 | Cookie `consentActiveStatus` (wird vom Tag Manager für 13 Auslöser gebraucht) | ✅ Zeichen für Zeichen wie beim alten Plugin (ab 1.0.6) |
-| Bestellbestätigung | ⏳ nur mit echter Testbestellung prüfbar |
+| Bestellbestätigung (Testbestellung 331024, Vorkasse, 7,52 € + 6,90 € Versand) | ✅ `Bestellbestätigung` genau einmal, `orderValue` 7,52 € (Warenwert brutto) – Google-Ads-Conversion (7,52 €), Shoplytics-Gewinn-Conversion (0,43 €), GA4-Kauf und Bing haben gefeuert (ab 1.0.8) |
+| Bestätigungsseite neu geladen | ✅ keine zweite Meldung |
+
+### Test pelletgrill.rocks (22.10.2026, Test-Set 40, Version 1.0.9)
+
+| Prüfung | Ergebnis |
+|---|---|
+| Tag Manager `GTM-KVGNQMX` genau einmal geladen, `globalValues` wie im Live-Shop | ✅ |
+| Kategorie „Smoker - Grills“: `itemListView` mit Kategoriepfad „Pelletgrills Pelletsmoker > Smoker - Grills“, Liste „Kategorieliste: …, Seite: 1“, Position ab 1 | ✅ – Container macht daraus `view_item_list` |
+| Artikelseite: `singleItemView` | ✅ – Container macht daraus `view_item` |
+| In den Warenkorb: `addToCartSingleItem` | ✅ – Container macht daraus `add_to_cart` |
+| Aus dem Warenkorb löschen: `removeFromCart` | ✅ – Container macht daraus `remove_from_cart` |
+| Kauf | nicht mit echter Bestellung getestet (gleicher Programmteil wie bei lackier-bedarf; dort ✅) – nach dem Live-Gang die erste echte Bestellung in Google Ads prüfen |
+
+Hinweis: Im Warenkorb (`basketItems`, `removeFromCart`) ist das Feld `category` leer, weil plentyShop dort keine Kategorie mitliefert. Google Analytics erhält bei „aus dem Warenkorb entfernt“ deshalb keine Kategorie. Für Google Ads (Conversion, Remarketing) spielt das keine Rolle.
+
+### Test b2b.bermaro.de (22.10.2026, Test-Set 41, Version 1.0.10)
+
+| Prüfung | Ergebnis |
+|---|---|
+| Tag Manager `GTM-TVGX67G` genau einmal geladen | ✅ |
+| Kategorie „Schleifen“: `itemListView` mit allen 20 Artikeln der Seite | ✅ (ab 1.0.10; vorher nur 8, weil plentyShop die unteren Kacheln erst beim Scrollen aufbaut) |
+| Artikelseite: `singleItemView` | ✅ |
+| In den Warenkorb: `addToCartSingleItem` genau einmal | ✅ |
+| Aus dem Warenkorb löschen: `removeFromCart` | ✅ |
+| Kauf | nicht mit echter Bestellung getestet – nach dem Live-Gang die erste echte Bestellung in Google Ads prüfen |
+
+**Abgleich mit dem alten Plugin im Live-Shop b2b.bermaro.de (22.10.2026)** – daraus folgte Version 1.0.11:
+- Kategorieseiten: Das alte Plugin meldet `pageType: "categoryItem"`. Der Google-Ads-Remarketing-Tag in GTM-TVGX67G **und** GTM-KVGNQMX übersetzt nur diesen Wert in „category“ → BermaroTracking meldet ab 1.0.11 ebenfalls `categoryItem`.
+- Artikel: Das alte Plugin meldet `price` **brutto** und zusätzlich `priceNet`, `amount`, `amountNet`, `rrp`, `rrpNet`, `number` – auch im B2B-Shop, der netto anzeigt. Der Remarketing-Tag nimmt auf der Artikelseite `price` als Wert → ab 1.0.11 identisch.
+- Währung: Das alte Plugin sendet `currency: "EUR"`. plentyShop liefert auf pelletgrill/B2B das Zeichen „€“; die GA4-Tags und die Ads-Conversion in GTM-KVGNQMX lesen `currency` → ab 1.0.12 sendet BermaroTracking ebenfalls „EUR“.
+- Weitere Unterschiede ohne Wirkung auf aktive Tags (nur von abgeschalteten Universal-Analytics-Tags gelesen): `webstoreName` „Bermaro Business B2B“, Ereignis `pageCategoryArticle`, `productLink`. Das alte Plugin meldet außerdem bis zu 48 Artikel je Liste, BermaroTracking die tatsächlich angezeigten Artikel der Seite.
+- Aktive Tags in GTM-TVGX67G: Google-Ads-Conversion (liest `orderData.0.orderId`, `orderData.0.itemSum`, `currency`) und Google-Ads-Remarketing (liest `pageType`, `singleItem`, `basketItems`, `basketData.0.itemSum`, `orderItems`, `orderData.0.itemSum`). Alle diese Felder liefert BermaroTracking.
+
+### Nachtest Version 1.0.12 (22.10.2026, Test-Sets 40 und 41)
+
+| Prüfung | pelletgrill.rocks | b2b.bermaro.de |
+|---|---|---|
+| `pageType` auf Kategorieseiten = `categoryItem` (wie altes Plugin) | ✅ | ✅ |
+| `currency` = „EUR“ | ✅ | ✅ |
+| Artikelfelder wie altes Plugin (`price` brutto, `priceNet`, `rrp`, `rrpNet`) – Werte verglichen mit dem Live-Shop | ✅ identisch (836,00 / 702,52 / 1.393,00 / 1.170,59) | ✅ identisch (6,47 / 5,44 / 10,40 / 8,74, `number` MIX1211141) |
+| Alle Artikel der Kategorieseite in `itemListView` | ✅ 2 von 2 | ✅ 20 von 20 |
+| GA4-Ereignisse, die der Container erzeugt (`view_item_list`, `view_item`) | ✅ | – (B2B-Container hat keine aktiven GA4-Tags) |
+| Daten liegen **vor** `gtm.load` im dataLayer (der Remarketing-Tag beider Container feuert bei `gtm.load`) | ✅ | ✅ |
+
+lackier-bedarf.info (Test-Set 44) mit 1.0.12 kurz nachgeprüft: Tag Manager `GTM-PKMRNKBW` einmal geladen, `currency` „EUR“, Kategorie „Schleifen“ mit 24 Artikeln (eingestellte Höchstzahl), Cookie `consentActiveStatus` gesetzt ✅. Alle Vorschauen im Browser wurden danach beendet.
+
+**Beobachtungspunkt nach dem Live-Gang:** Der Google-Ads-Remarketing-Tag in GTM-KVGNQMX und GTM-TVGX67G feuert beim Ereignis `gtm.load` (Seite fertig geladen) und liest dann `pageType`, `singleItem`, `basketItems`. Das alte Plugin schrieb diese Daten direkt in die Seite; BermaroTracking schreibt sie per Skript – in allen Tests deutlich vor `gtm.load`. Startet das Skript auf einer extrem langsamen Seite erst nach dem Laden, fehlen dem Remarketing auf dieser einen Seite die Angaben (Conversion-Tracking ist davon nicht betroffen, es feuert bei `orderConfirmation`). Einmal nach dem Live-Gang im Tag-Manager-Vorschaumodus prüfen.
 
 Abgleich mit dem Tag-Manager-Container GTM-PKMRNKBW (22.10.2026): Alle Felder, die Tags oder Auslöser tatsächlich verwenden, liefert das Plugin. Weitere vom alten Plugin bekannte Felder (z. B. `addCartName`, `visitorId`, `customerHash`, `categoryId`) werden im Container von keinem Tag benutzt.
 
-Versionsstand: 1.0.7 (22.10.2026)
+Abgleich mit GTM-KVGNQMX (pelletgrill.rocks, 22.10.2026): Die GA4-Ereignisse erzeugt der Container selbst aus den cfour-Ereignissen (eigene HTML-Tags). Gelesen werden nur Felder, die das Plugin liefert (id, name, itemName, price, brand, category, variant, quantity, position, list, orderData, orderItems). Kein verstecktes Cookie des alten Plugins.
+
+Abgleich mit GTM-TVGX67G (b2b.bermaro.de, 22.10.2026): Aktiv relevant sind nur Google-Ads-Conversion (orderData.0.orderId, orderData.0.itemSum, currency) und Remarketing; die übrigen Tags sind abgeschaltete Universal-Analytics-Tags.
+
+Versionsstand: 1.0.12 (22.10.2026)
