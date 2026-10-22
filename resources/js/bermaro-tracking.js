@@ -361,13 +361,42 @@
         return element.__vue__ || (element.parentElement && element.parentElement.__vue__) || null;
     }
 
+    /*
+     * Artikeldaten, die plentyShop für jede Kachel als JSON in die Seite schreibt
+     * (<script type="application/json" id="..."> – die Kachel verweist darauf mit dem Attribut "item-data-ref").
+     * So sind auch Kacheln lesbar, die plentyShop erst beim Scrollen aufbaut (Feststellung 22.10.2026, b2b.bermaro.de).
+     */
+    var tileJsonCache = {};
+
+    function tileDocumentFromRef(element) {
+        var ref = element && element.getAttribute ? element.getAttribute("item-data-ref") : "";
+        if (!ref) {
+            return null;
+        }
+        if (tileJsonCache.hasOwnProperty(ref)) {
+            return tileJsonCache[ref];
+        }
+        var result = null;
+        try {
+            var script = document.getElementById(ref);
+            if (script && script.textContent) {
+                var parsed = JSON.parse(script.textContent);
+                if (parsed && typeof parsed === "object" && parsed.variation) {
+                    result = parsed;
+                }
+            }
+        } catch (error) {
+            result = null;
+        }
+        tileJsonCache[ref] = result;
+        return result;
+    }
+
     /** Variantendokument einer Artikelkachel */
     function tileDocument(element) {
         var component = tileComponent(element);
-        if (!component) {
-            return null;
-        }
-        return component.item || get(component, "$props.itemData", null) || null;
+        var documentData = component ? (component.item || get(component, "$props.itemData", null) || null) : null;
+        return documentData || tileDocumentFromRef(element);
     }
 
     /** Liegt die Kachel in einem Karussell (z. B. "Zuletzt gesehen")? */
