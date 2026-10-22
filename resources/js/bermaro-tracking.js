@@ -359,7 +359,16 @@
         return !!(element.closest && element.closest(".owl-carousel, .owl-stage, .list-item-carousel"));
     }
 
-    /** Sind alle Kacheln der Seite (ohne Karussells) fertig aufgebaut? */
+    /*
+     * Sind die Kacheln der Seite (ohne Karussells) fertig? plentyShop baut Kacheln unterhalb des sichtbaren Bereichs erst
+     * beim Scrollen auf (Test 22.10.2026). Darum gilt die Liste als fertig, wenn
+     *  - alle Kacheln fertig sind, ODER
+     *  - genug Kacheln für die Höchstzahl fertig sind, ODER
+     *  - sich die Zahl der fertigen Kacheln bei drei Prüfungen hintereinander nicht mehr ändert.
+     */
+    var tilesLastReady = -1;
+    var tilesStableChecks = 0;
+
     function allTilesReady() {
         var nodes = document.querySelectorAll(".cmp-product-thumb");
         var total = 0;
@@ -373,7 +382,13 @@
                 ready++;
             }
         }
-        return total > 0 && ready === total;
+        if (ready > 0 && ready === tilesLastReady) {
+            tilesStableChecks++;
+        } else {
+            tilesStableChecks = 0;
+        }
+        tilesLastReady = ready;
+        return total > 0 && (ready === total || ready >= cfg.maxListItems || (ready > 0 && tilesStableChecks >= 3));
     }
 
     /** Alle sichtbaren Artikelkacheln der Seite */

@@ -1,5 +1,9 @@
 # Versionshinweise BERMARO Tracking
 
+## 1.0.5 (22.10.2026)
+
+- Produktlisten werden gemeldet, sobald die sichtbaren Kacheln fertig sind (plentyShop baut Kacheln unterhalb des sichtbaren Bereichs erst beim Scrollen auf).
+
 ## 1.0.4 (22.10.2026)
 
 - Haupt-Skript wird unabhängig (async) geladen, damit es nicht hinter langsamen Fremd-Skripten wartet; Nachladen schon kurz nach DOMContentLoaded.

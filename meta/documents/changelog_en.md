@@ -1,5 +1,9 @@
 # Release notes BERMARO Tracking
 
+## 1.0.5 (2026-10-22)
+
+- Product lists are reported as soon as the visible tiles are ready (plentyShop hydrates tiles below the fold only on scroll).
+
 ## 1.0.4 (2026-10-22)
 
 - Main script is loaded async so it no longer waits behind slow third-party scripts; retry shortly after DOMContentLoaded.
