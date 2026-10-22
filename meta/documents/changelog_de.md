@@ -1,5 +1,9 @@
 # Versionshinweise BERMARO Tracking
 
+## 1.0.6 (22.10.2026)
+
+- Felix-Format: Cookie "consentActiveStatus" wird wie beim alten Felix-Ries-Plugin gesetzt. Der Tag-Manager-Container von lackier-bedarf.info prüft damit vor 13 Auslösern (u. a. Google-Ads-Conversion) die Einwilligung – ohne das Cookie würden diese Tags bei neuen Besuchern nicht feuern.
+
 ## 1.0.5 (22.10.2026)
 
 - Produktlisten werden gemeldet, sobald die sichtbaren Kacheln fertig sind (plentyShop baut Kacheln unterhalb des sichtbaren Bereichs erst beim Scrollen auf).

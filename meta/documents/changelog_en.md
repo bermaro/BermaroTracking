@@ -1,5 +1,9 @@
 # Release notes BERMARO Tracking
 
+## 1.0.6 (2026-10-22)
+
+- felixries format: sets the "consentActiveStatus" cookie exactly like the old Felix Ries plugin. The lackier-bedarf.info GTM container uses it in 13 trigger conditions (incl. Google Ads conversion).
+
 ## 1.0.5 (2026-10-22)
 
 - Product lists are reported as soon as the visible tiles are ready (plentyShop hydrates tiles below the fold only on scroll).

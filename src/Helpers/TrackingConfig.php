@@ -23,7 +23,7 @@ class TrackingConfig
     const PLUGIN = 'BermaroTracking';
 
     /** Plugin-Version, wird zum Neuladen der JS-Datei (Cache) verwendet */
-    const VERSION = '1.0.5';
+    const VERSION = '1.0.6';
 
     /** Alle möglichen Datenformate */
     const FORMATS = ['felixries', 'cfour', 'ga4'];
@@ -311,6 +311,30 @@ class TrackingConfig
     }
 
     /**
+     * Technische Schlüssel (ohne Gruppe) der Dienste, die im Cookie-Banner registriert werden,
+     * z. B. ["googleanalytics", "googleads", "bingads"].
+     * Wird für das Felix-Cookie "consentActiveStatus" gebraucht (siehe Head.twig).
+     *
+     * @return array
+     */
+    public function getActiveConsentKeys()
+    {
+        $keys = [];
+        foreach (['analytics', 'ads', 'bing'] as $type) {
+            if (!$this->getBool('consent.register' . ucfirst($type), true)) {
+                continue;
+            }
+            $full = $this->getConsentKey($type);
+            $position = strpos($full, '.');
+            $key = $position === false ? $full : substr($full, $position + 1);
+            if (strlen($key) && !in_array($key, $keys, true)) {
+                $keys[] = $key;
+            }
+        }
+        return $keys;
+    }
+
+    /**
      * Ganzzahl-Einstellung mit Unter- und Obergrenze.
      *
      * @param string $key
@@ -373,7 +397,8 @@ class TrackingConfig
                 'analytics' => $this->getConsentKey('analytics'),
                 'ads'       => $this->getConsentKey('ads'),
                 'bing'      => $this->getConsentKey('bing')
-            ]
+            ],
+            'activeConsentKeys'       => $this->getActiveConsentKeys()
         ];
     }
 
