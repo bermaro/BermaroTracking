@@ -1330,6 +1330,17 @@
     /** cfour-Format: allgemeine Seitendaten auf jeder Seite */
     var sendGlobalValues = safe("sendGlobalValues", function () {
         var items = get(store(), "state.basket.items", []);
+        /*
+         * Artikelseite: die globale Variable "singleItem" schon VOR globalValues bereitstellen.
+         * Grund (Abstimmung Stefan Kaltenecker, 23.10.2026): Das Remarketing-Tag soll künftig beim
+         * Ereignis "globalValues" feuern (statt bei "Window Loaded") und liest dabei singleItem[0].*.
+         */
+        if (templateType() === "item" && !window.singleItem) {
+            var itemProduct = currentItemProduct();
+            if (itemProduct) {
+                window.singleItem = [cfourProduct(itemProduct)];
+            }
+        }
         push({
             event: "globalValues",
             currency: currency(),

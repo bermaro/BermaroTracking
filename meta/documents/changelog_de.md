@@ -1,5 +1,9 @@
 # Versionshinweise BERMARO Tracking
 
+## 1.0.16 (23.10.2026)
+
+- cfour-Format: Auf Artikelseiten steht die globale Variable `singleItem` jetzt schon beim Ereignis "globalValues" bereit. Vorbereitung dafür, dass das Remarketing-Tag in den Containern von pelletgrill.rocks/B2B künftig bei "globalValues" statt bei "Window Loaded" feuert (Vorschlag Stefan Kaltenecker) – dann spielt die Ladezeit des Plugins (Neuladen, Zurück-Navigation, langsame Verbindung) keine Rolle mehr.
+
 ## 1.0.15 (23.10.2026)
 
 - cfour-Format: Auf Artikelseiten wird zusätzlich die globale JavaScript-Variable `singleItem` gesetzt (wie beim bisherigen Plugin). Die Remarketing-Variablen der Container von pelletgrill.rocks und B2B lesen dort `singleItem[0].id/.name/.price/.category` direkt – ohne die Variable gingen ecomm_prodid, ecomm_pname, ecomm_totalvalue und ecomm_pcat leer raus.

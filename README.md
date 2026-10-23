@@ -15,7 +15,8 @@ Hinweis Kampagne 34 („Gutschein-KA ab 100€ Neue Codes“, Uptain): Codes 222
 1. Remarketing-Tag (feuert bei „Window Loaded“/gtm.load) bekam bei gecachten Seiten noch keinen pageType → ab **1.0.14** werden globalValues und singleItemView garantiert vor gtm.load gesendet.
 2. Consent Mode v2 war auf pelletgrill/B2B „Aus“ → auf **Advanced** gestellt (alle vier Signale, Update nach echter Banner-Auswahl). Die zusätzlichen v1-Consent-Befehle (nur ad_storage/analytics_storage) stammen **nicht vom Plugin**, sondern aus Custom-HTML-Tags im Container GTM-KVGNQMX – Entfernen/Anpassen der Trigger (Bedingung plenty-shop-cookie) ist eine Container-Änderung (Stefan/Bernd entscheiden, ob Ablehner cookielose Pings senden dürfen).
 3. Remarketing auf Artikelseiten: Die Container-Variablen lesen die **globale JS-Variable `singleItem`** (nicht den dataLayer) → ab **1.0.15** setzt das Plugin `window.singleItem` wie das alte Plugin.
-4. `valueBasis` wirkt nur auf Felix- und GA4-Format; `orderData.0.itemSum` im cfour-Format ist immer Warenwert brutto (nach Gutschein).
+4. Nachtest Stefan 23.10.: Bei Neuladen/Zurück-Navigation kann das Plugin in Einzelfällen nach gtm.load starten (Loader-Retry). Lösung: Remarketing-Tag in GTM-KVGNQMX/GTM-TVGX67G auf das Ereignis `globalValues` (einmal pro Seite) umstellen; ab **1.0.16** steht `singleItem` dafür schon bei globalValues bereit.
+5. `valueBasis` wirkt nur auf Felix- und GA4-Format; `orderData.0.itemSum` im cfour-Format ist immer Warenwert brutto (nach Gutschein).
 
 Der Tag Manager selbst und die Einstellungen darin (Tags, Trigger, Shoplytics) bleiben **unverändert**. Das Plugin liefert die Daten im jeweils bisherigen Format. Deshalb muss im Tag Manager nichts umgebaut werden.
 
@@ -219,4 +220,4 @@ Abgleich mit GTM-KVGNQMX (pelletgrill.rocks, 22.10.2026): Die GA4-Ereignisse erz
 
 Abgleich mit GTM-TVGX67G (b2b.bermaro.de, 22.10.2026): Aktiv relevant sind nur Google-Ads-Conversion (orderData.0.orderId, orderData.0.itemSum, currency) und Remarketing; die übrigen Tags sind abgeschaltete Universal-Analytics-Tags.
 
-Versionsstand: 1.0.15 (23.10.2026)
+Versionsstand: 1.0.16 (23.10.2026)
