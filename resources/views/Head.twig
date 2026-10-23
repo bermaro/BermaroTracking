@@ -13,6 +13,22 @@
         }
         window.BermaroTrackingHeadStarted = true;
 
+        /*
+         * Als ERSTES beim Ereignis "Seite fertig geladen" anmelden – noch bevor der Tag Manager
+         * geladen wird. Dadurch läuft dieser Aufruf vor dem Tag-Manager-Ereignis gtm.load, und das
+         * Haupt-Skript kann ausstehende Seitendaten (globalValues, Artikelansicht) rechtzeitig senden
+         * (Remarketing-Tag auf pelletgrill.rocks/B2B feuert bei gtm.load).
+         */
+        window.addEventListener("load", function () {
+            try {
+                if (typeof window.BermaroTrackingBeforeLoad === "function") {
+                    window.BermaroTrackingBeforeLoad();
+                }
+            } catch (error) {
+                // Fehler dürfen den Shop nie stören
+            }
+        });
+
         var dataLayer = window.dataLayer;
         var useConsentMode = cfg.consentMode === "basic" || cfg.consentMode === "advanced";
         var lastConsentState = "";

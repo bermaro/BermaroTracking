@@ -1,5 +1,10 @@
 # Versionshinweise BERMARO Tracking
 
+## 1.0.14 (23.10.2026)
+
+- cfour-Format (pelletgrill.rocks, B2B): "globalValues" und die Artikelansicht ("singleItemView") werden jetzt garantiert VOR dem Tag-Manager-Ereignis "Window Loaded" (gtm.load) gesendet. Das Google-Ads-Remarketing-Tag feuert bei gtm.load und bekam vorher bei gecachten Seiten noch keinen Seitentyp (ecomm_pagetype "other", leere ecomm_prodid). Hinweis von Stefan Kaltenecker.
+- Technisch: Das Kopf-Skript meldet sich als Erstes beim "load"-Ereignis an (vor dem Tag Manager) und lässt ausstehende Daten sofort senden. globalValues wird pro Seite nur einmal gesendet.
+
 ## 1.0.13 (22.10.2026)
 
 - Google Consent Mode "Advanced" meldet Google jetzt zuverlässig den echten Einwilligungsstand aus dem plentyShop-Cookie-Banner. Sendet ein anderes Skript (z. B. Shoplytics) danach "denied", wird sofort der echte Stand hinterhergeschickt. Hintergrund: Auf lackier-bedarf.info gingen Käufe und Google-Ads-Conversions sonst trotz Zustimmung "ohne Cookies" (gcs=G100) raus.

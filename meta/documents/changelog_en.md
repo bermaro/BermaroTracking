@@ -1,5 +1,9 @@
 # Release notes BERMARO Tracking
 
+## 1.0.14 (2026-10-23)
+
+- cfour format (pelletgrill.rocks, B2B): "globalValues" and the item view ("singleItemView") are now always pushed BEFORE the Tag Manager event "Window Loaded" (gtm.load), which the Google Ads remarketing tag uses (previously ecomm_pagetype "other" on cached pages).
+
 ## 1.0.13 (2026-10-22)
 
 - Google Consent Mode "Advanced" now reliably reports the real consent state from the plentyShop cookie bar. If another script (e.g. Shoplytics) sends "denied" afterwards, the real state is re-sent immediately (purchases and Google Ads conversions were otherwise sent cookieless, gcs=G100, despite consent).

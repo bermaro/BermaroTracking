@@ -11,6 +11,11 @@ Eigenes Plugin der BERMARO GmbH. Es ersetzt
 Dabei gefunden: Beide Treffer gingen mit `gcs=G100` raus, also „Einwilligung verweigert“, obwohl im Cookie-Banner zugestimmt war. Ursache: Shoplytics sendet `consent update: denied`, weil es die Einwilligung im (URL-kodierten) Cookie `plenty-shop-cookie` nicht findet. Lösung ab **1.0.13**: Consent Mode auf lackier-bedarf.info = **Advanced**; das Plugin schickt nach jedem fremden consent-update sofort den echten Stand aus dem Cookie-Banner hinterher.
 Hinweis Kampagne 34 („Gutschein-KA ab 100€ Neue Codes“, Uptain): Codes 222QNS und 222RDQ wurden im Shop als „bereits verwendet oder ungültig“ abgelehnt, obwohl im Backend „aktiv“ – Einstellungen (Mandant Standard, Kundenklassen, Kategorien) sahen unauffällig aus; Ursache nicht abschließend geklärt.
 
+**Prüfung Stefan Kaltenecker 23.10.2026 (pelletgrill.rocks) und Umsetzung:**
+1. Remarketing-Tag (feuert bei „Window Loaded“/gtm.load) bekam bei gecachten Seiten noch keinen pageType → ab **1.0.14** werden globalValues und singleItemView garantiert vor gtm.load gesendet.
+2. Consent Mode v2 war auf pelletgrill/B2B „Aus“ → auf **Advanced** gestellt (alle vier Signale, Update nach echter Banner-Auswahl). Die zusätzlichen v1-Consent-Befehle (nur ad_storage/analytics_storage) stammen **nicht vom Plugin**, sondern aus Custom-HTML-Tags im Container GTM-KVGNQMX – Entfernen/Anpassen der Trigger (Bedingung plenty-shop-cookie) ist eine Container-Änderung (Stefan/Bernd entscheiden, ob Ablehner cookielose Pings senden dürfen).
+3. `valueBasis` wirkt nur auf Felix- und GA4-Format; `orderData.0.itemSum` im cfour-Format ist immer Warenwert brutto (nach Gutschein).
+
 Der Tag Manager selbst und die Einstellungen darin (Tags, Trigger, Shoplytics) bleiben **unverändert**. Das Plugin liefert die Daten im jeweils bisherigen Format. Deshalb muss im Tag Manager nichts umgebaut werden.
 
 ---
@@ -47,7 +52,7 @@ Test-Sets (Kopien, nicht live; „Sicherung“ = Kopie des Live-Sets vom 29.09.2
 | Datenformat | nur **Felix Ries** | nur **cfour** | nur **cfour** |
 | Artikel-ID | Varianten-ID | Varianten-ID (= wie altes Plugin, geprüft) | Varianten-ID (= wie altes Plugin, geprüft) |
 | Bestellwert | **Warenwert brutto (ohne Versand)** – wie bisher bei Felix („Brutto“) | egal (cfour nutzt Warenwert brutto) | egal |
-| Consent Mode | **Advanced** (ab 1.0.13; korrigiert das „denied“ von Shoplytics) | Aus | Aus |
+| Consent Mode | **Advanced** (ab 1.0.13; korrigiert das „denied“ von Shoplytics) | **Advanced** (ab 23.10.2026) | **Advanced** (ab 23.10.2026) |
 | Google Analytics: Schlüssel / Gruppe | `googleanalytics` / Statistik | `gtmGoogleAnalytics` / Statistik | `gtmGoogleAnalytics` / Statistik (Eintrag gibt es im Live-Shop bereits) |
 | Google Ads: Schlüssel / Gruppe | `googleads` / Marketing | `gtmGoogleAds` / Statistik | `gtmGoogleAds` / Statistik |
 | Bing: Schlüssel / Gruppe | `bingads` / Statistik | Eintrag **aus** | Eintrag **aus** |

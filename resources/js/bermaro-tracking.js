@@ -1542,6 +1542,61 @@
     }), true);
 
     /* ------------------------------------------------------------------ */
+    /* REIHENFOLGE VOR "SEITE FERTIG GELADEN" (gtm.load)                   */
+    /* ------------------------------------------------------------------ */
+
+    /*
+     * Hintergrund (Hinweis Stefan Kaltenecker, 23.10.2026): Das Google-Ads-Remarketing-Tag in den
+     * Containern von pelletgrill.rocks / B2B feuert beim Ereignis "Window Loaded" (gtm.load) und liest
+     * dann pageType, singleItem und basketItems. Kamen globalValues bzw. die Artikelansicht erst
+     * danach, meldete das Tag ecomm_pagetype "other" und keine Artikel-ID.
+     * Lösung: Beides wird spätestens unmittelbar VOR gtm.load gesendet. Das Kopf-Skript (Head.twig)
+     * meldet sich dafür als Erstes beim "load"-Ereignis an – noch vor dem Tag Manager – und ruft
+     * window.BermaroTrackingBeforeLoad auf.
+     */
+    var globalValuesSent = false;
+    var firstItemViewSent = false;
+
+    /** globalValues nur einmal pro Seite senden */
+    function sendGlobalValuesOnce() {
+        if (globalValuesSent) {
+            return;
+        }
+        globalValuesSent = true;
+        sendGlobalValues();
+    }
+
+    /** Erste Artikelansicht der Detailseite (nur einmal) + spätere Variantenwechsel */
+    var sendFirstItemView = safe("sendFirstItemView", function (product) {
+        if (firstItemViewSent || !product) {
+            return;
+        }
+        firstItemViewSent = true;
+        sendItemView(product);
+        // Bei Wechsel der Variante (z. B. andere Größe) erneut melden
+        if (store() && typeof store().watch === "function") {
+            store().watch(function () {
+                return get(currentItemDocument(), "variation.id", 0);
+            }, function () {
+                var changed = currentItemProduct();
+                if (changed) {
+                    sendItemView(changed);
+                }
+            });
+        }
+    });
+
+    /** Wird direkt vor gtm.load aufgerufen: alles Ausstehende jetzt sofort senden */
+    window.BermaroTrackingBeforeLoad = safe("beforeWindowLoad", function () {
+        if (USE_CFOUR) {
+            sendGlobalValuesOnce();
+        }
+        if (templateType() === "item" && isEnabled("itemView") && !firstItemViewSent) {
+            sendFirstItemView(currentItemProduct());
+        }
+    });
+
+    /* ------------------------------------------------------------------ */
     /* START                                                               */
     /* ------------------------------------------------------------------ */
 
@@ -1570,10 +1625,16 @@
 
         // cfour-Format: allgemeine Seitendaten, sobald der Warenkorb geladen ist
         if (USE_CFOUR) {
-            // Falls der Warenkorb nicht rechtzeitig lädt, trotzdem senden (mit den vorhandenen Daten)
-            waitFor(function () {
-                return get(store(), "state.basket.isBasketInitiallyLoaded", false);
-            }, sendGlobalValues, 40, 250, sendGlobalValues);
+            if (get(store(), "state.basket.isBasketInitiallyLoaded", false)) {
+                // Warenkorb ist schon da: sofort senden
+                sendGlobalValuesOnce();
+            } else {
+                // Falls der Warenkorb nicht rechtzeitig lädt, trotzdem senden (mit den vorhandenen Daten).
+                // Spätestens beim Ereignis "Seite fertig geladen" wird gesendet (siehe sendBeforeWindowLoad).
+                waitFor(function () {
+                    return get(store(), "state.basket.isBasketInitiallyLoaded", false);
+                }, sendGlobalValuesOnce, 40, 100, sendGlobalValuesOnce);
+            }
         }
 
         // Bestellbestätigung
@@ -1598,20 +1659,7 @@
         if (type === "item" && isEnabled("itemView")) {
             waitFor(function () {
                 return currentItemProduct();
-            }, function (product) {
-                sendItemView(product);
-                // Bei Wechsel der Variante (z. B. andere Größe) erneut melden
-                if (store() && typeof store().watch === "function") {
-                    store().watch(function () {
-                        return get(currentItemDocument(), "variation.id", 0);
-                    }, function () {
-                        var changed = currentItemProduct();
-                        if (changed) {
-                            sendItemView(changed);
-                        }
-                    });
-                }
-            }, 40, 250);
+            }, sendFirstItemView, 40, 100);
         }
 
         // Produktlisten
