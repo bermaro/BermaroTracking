@@ -837,7 +837,15 @@
             });
         }
         if (USE_CFOUR) {
-            push({ event: "singleItemView", currency: currency(), singleItem: [cfourProduct(product)] });
+            var singleItemList = [cfourProduct(product)];
+            /*
+             * Zusätzlich als GLOBALE Variable "singleItem" bereitstellen – wie das bisherige Plugin.
+             * Die Remarketing-Variablen in den Containern von pelletgrill.rocks/B2B lesen auf
+             * Artikelseiten direkt singleItem[0].id / .name / .price / .category (JavaScript-Variable,
+             * NICHT dataLayer). Fehlt sie, gehen ecomm_prodid & Co. leer raus. (Festgestellt 23.10.2026)
+             */
+            window.singleItem = singleItemList;
+            push({ event: "singleItemView", currency: currency(), singleItem: singleItemList });
         }
         if (USE_GA4) {
             ga4Event("view_item", {

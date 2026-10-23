@@ -1,5 +1,9 @@
 # Release notes BERMARO Tracking
 
+## 1.0.15 (2026-10-23)
+
+- cfour format: on item pages the global JavaScript variable `singleItem` is set as well (like the previous plugin); the remarketing variables of the pelletgrill.rocks / B2B containers read `singleItem[0].*` directly.
+
 ## 1.0.14 (2026-10-23)
 
 - cfour format (pelletgrill.rocks, B2B): "globalValues" and the item view ("singleItemView") are now always pushed BEFORE the Tag Manager event "Window Loaded" (gtm.load), which the Google Ads remarketing tag uses (previously ecomm_pagetype "other" on cached pages).
