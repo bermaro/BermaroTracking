@@ -1,5 +1,9 @@
 # Release notes BERMARO Tracking
 
+## 1.0.17 (2026-10-23)
+
+- Order confirmation: the order event is now pushed BEFORE "globalValues" (remarketing tag fires on globalValues and reads orderItems).
+
 ## 1.0.16 (2026-10-23)
 
 - cfour format: on item pages the global `singleItem` variable is already available when "globalValues" is pushed (preparation for firing the remarketing tag on "globalValues" instead of "Window Loaded").

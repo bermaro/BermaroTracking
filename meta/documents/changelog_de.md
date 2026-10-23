@@ -1,5 +1,9 @@
 # Versionshinweise BERMARO Tracking
 
+## 1.0.17 (23.10.2026)
+
+- Bestellbestätigung: Das Bestell-Ereignis ("orderConfirmation" bzw. Felix-"purchase") wird jetzt VOR "globalValues" gesendet. Grund: Das Remarketing-Tag der Container von pelletgrill.rocks/B2B feuert künftig bei "globalValues" und liest auf der Bestätigungsseite die Produkt-IDs aus "orderItems" (Hinweis Stefan Kaltenecker).
+
 ## 1.0.16 (23.10.2026)
 
 - cfour-Format: Auf Artikelseiten steht die globale Variable `singleItem` jetzt schon beim Ereignis "globalValues" bereit. Vorbereitung dafür, dass das Remarketing-Tag in den Containern von pelletgrill.rocks/B2B künftig bei "globalValues" statt bei "Window Loaded" feuert (Vorschlag Stefan Kaltenecker) – dann spielt die Ladezeit des Plugins (Neuladen, Zurück-Navigation, langsame Verbindung) keine Rolle mehr.

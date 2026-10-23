@@ -1642,21 +1642,12 @@
 
         var type = templateType();
 
-        // cfour-Format: allgemeine Seitendaten, sobald der Warenkorb geladen ist
-        if (USE_CFOUR) {
-            if (get(store(), "state.basket.isBasketInitiallyLoaded", false)) {
-                // Warenkorb ist schon da: sofort senden
-                sendGlobalValuesOnce();
-            } else {
-                // Falls der Warenkorb nicht rechtzeitig lädt, trotzdem senden (mit den vorhandenen Daten).
-                // Spätestens beim Ereignis "Seite fertig geladen" wird gesendet (siehe sendBeforeWindowLoad).
-                waitFor(function () {
-                    return get(store(), "state.basket.isBasketInitiallyLoaded", false);
-                }, sendGlobalValuesOnce, 40, 100, sendGlobalValuesOnce);
-            }
-        }
-
-        // Bestellbestätigung
+        /*
+         * Bestellbestätigung ZUERST (vor globalValues): Das Remarketing-Tag in den Containern von
+         * pelletgrill.rocks/B2B feuert künftig beim Ereignis "globalValues" und liest auf der
+         * Bestätigungsseite ecomm_prodid aus "orderItems". Diese Daten müssen deshalb schon im
+         * dataLayer stehen, wenn globalValues kommt. (Hinweis Stefan Kaltenecker, 23.10.2026)
+         */
         if (isEnabled("purchase") && window.BermaroTrackingOrder) {
             sendPurchase(window.BermaroTrackingOrder);
         } else if (isEnabled("purchase") && type === "confirmation") {
@@ -1672,6 +1663,20 @@
                 log("Bestellung aus der Seite gelesen", order);
                 sendPurchase(order);
             }, 40, 250);
+        }
+
+        // cfour-Format: allgemeine Seitendaten, sobald der Warenkorb geladen ist
+        if (USE_CFOUR) {
+            if (get(store(), "state.basket.isBasketInitiallyLoaded", false)) {
+                // Warenkorb ist schon da: sofort senden
+                sendGlobalValuesOnce();
+            } else {
+                // Falls der Warenkorb nicht rechtzeitig lädt, trotzdem senden (mit den vorhandenen Daten).
+                // Spätestens beim Ereignis "Seite fertig geladen" wird gesendet (siehe BermaroTrackingBeforeLoad).
+                waitFor(function () {
+                    return get(store(), "state.basket.isBasketInitiallyLoaded", false);
+                }, sendGlobalValuesOnce, 40, 100, sendGlobalValuesOnce);
+            }
         }
 
         // Artikeldetailseite
