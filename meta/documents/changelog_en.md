@@ -1,5 +1,10 @@
 # Release notes BERMARO Tracking
 
+## 1.0.18 (2026-10-27)
+
+- Tag Manager loads in the `<head>` again: plentyShop LTS moves all `<script>` tags from layout containers to the end of the page. The head script tags now carry `data-bermaro-head="v2"`, which the Ceres filter skips.
+- Consent in the `<head>`: read directly from the `plenty-shop-cookie` cookie until plentyShop's ConsentManager is available.
+
 ## 1.0.17 (2026-10-23)
 
 - Order confirmation: the order event is now pushed BEFORE "globalValues" (remarketing tag fires on globalValues and reads orderItems).

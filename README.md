@@ -216,8 +216,8 @@ lackier-bedarf.info (Test-Set 44) mit 1.0.12 kurz nachgeprüft: Tag Manager `GTM
 
 Abgleich mit dem Tag-Manager-Container GTM-PKMRNKBW (22.10.2026): Alle Felder, die Tags oder Auslöser tatsächlich verwenden, liefert das Plugin. Weitere vom alten Plugin bekannte Felder (z. B. `addCartName`, `visitorId`, `customerHash`, `categoryId`) werden im Container von keinem Tag benutzt.
 
-Abgleich mit GTM-KVGNQMX (pelletgrill.rocks, 22.10.2026): Die GA4-Ereignisse erzeugt der Container selbst aus den cfour-Ereignissen (eigene HTML-Tags). Gelesen werden nur Felder, die das Plugin liefert (id, name, itemName, price, brand, category, variant, quantity, position, list, orderData, orderItems). Kein verstecktes Cookie des alten Plugins.
+Abgleich mit GTM-KVGNQMX (pelletgrill.rocks, 22.10.2026): Alle Felder, die Tags oder Auslöser tatsächlich verwenden, liefert das Plugin. Weitere vom alten Plugin bekannte Felder (z. B. `addCartName`, `visitorId`, `customerHash`, `categoryId`) werden im Container von keinem Tag benutzt.
 
 Abgleich mit GTM-TVGX67G (b2b.bermaro.de, 22.10.2026): Aktiv relevant sind nur Google-Ads-Conversion (orderData.0.orderId, orderData.0.itemSum, currency) und Remarketing; die übrigen Tags sind abgeschaltete Universal-Analytics-Tags.
 
-Versionsstand: 1.0.17 (23.10.2026)
+Versionsstand: 1.0.18 (27.10.2026)

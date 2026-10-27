@@ -1,5 +1,10 @@
 # Versionshinweise BERMARO Tracking
 
+## 1.0.18 (27.10.2026)
+
+- Tag Manager lädt wieder im `<head>`: plentyShop LTS verschiebt alle `<script>`-Tags aus Layout-Containern ans Seitenende (Ceres-Filter `TwigStyleScriptTagFilter`). Dadurch startete der Tag Manager erst nach dem Seitenaufbau, und Google Ads meldete am 27.10.2026 „Tag nicht richtig platziert – zu weit unten auf der Seite“. Die beiden Script-Tags in `Head.twig` tragen jetzt das Merkmal `data-bermaro-head="v2"`, das der Ceres-Filter bewusst übergeht.
+- Einwilligung im `<head>`: Weil der ConsentManager von plentyShop dort noch nicht geladen ist, liest das Plugin die Einwilligung direkt aus dem Cookie `plenty-shop-cookie`. So erhält Google den richtigen Consent-Status schon vor dem Laden des Tag Managers (kein früher „denied“-Seitenaufruf bei Besuchern, die zugestimmt haben).
+
 ## 1.0.17 (23.10.2026)
 
 - Bestellbestätigung: Das Bestell-Ereignis ("orderConfirmation" bzw. Felix-"purchase") wird jetzt VOR "globalValues" gesendet. Grund: Das Remarketing-Tag der Container von pelletgrill.rocks/B2B feuert künftig bei "globalValues" und liest auf der Bestätigungsseite die Produkt-IDs aus "orderItems" (Hinweis Stefan Kaltenecker).

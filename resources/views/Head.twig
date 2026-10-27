@@ -1,9 +1,18 @@
-{# BERMARO Tracking: Tag Manager im <head> laden #}
-<script>
+{# BERMARO Tracking: Tag Manager im <head> laden
+
+   WICHTIG (seit Version 1.0.18, Befund vom 27.10.2026):
+   plentyShop LTS (Ceres) sammelt alle <script>-Tags aus normalen Layout-Containern ein und
+   setzt sie ganz ans Ende der Seite (Ceres\Extensions\TwigStyleScriptTagFilter, Suchmuster
+   "<script[^2]*>"). Dadurch lud der Tag Manager erst nach dem kompletten Seitenaufbau und
+   Google Ads meldete "Tag nicht richtig platziert – zu weit unten auf der Seite".
+   Script-Tags, deren Start-Tag die Ziffer 2 enthält, lässt dieser Filter bewusst in Ruhe.
+   Deshalb tragen beide Script-Tags hier das Merkmal data-bermaro-head="v2" – so bleiben sie
+   im <head>. Bitte dieses Merkmal NICHT entfernen. #}
+<script data-bermaro-head="v2">
     window.dataLayer = window.dataLayer || [];
     window.BermaroTrackingConfig = {{ configJson | raw }};
 </script>
-<script>
+<script data-bermaro-head="v2">
     (function (window, document) {
         "use strict";
 
@@ -56,16 +65,76 @@
             return false;
         }
 
-        /* Hilfe: Ist ein Consent-Schlüssel erlaubt? */
-        function isConsented(key) {
-            var cm = window.ConsentManager;
-            return !!(key && cm && typeof cm.isConsented === "function" && cm.isConsented(key));
+        /*
+         * Einwilligung direkt aus dem plentyShop-Cookie "plenty-shop-cookie" lesen.
+         * Grund: Im <head> gibt es den ConsentManager von plentyShop noch nicht (er wird erst am
+         * Seitenende geladen). Das Cookie ist aber sofort lesbar. Inhalt (URL-kodiert), z. B.:
+         * {"necessary":{...},"tracking":{"googleanalytics":true},"marketing":{"googleads":true},"_id":"..."}
+         * Ergebnis: das gelesene Objekt oder null (kein Cookie = Besucher hat noch nicht geantwortet).
+         */
+        function readConsentCookie() {
+            try {
+                var parts = document.cookie ? document.cookie.split(";") : [];
+                for (var i = 0; i < parts.length; i++) {
+                    var part = parts[i].replace(/^\s+/, "");
+                    if (part.indexOf("plenty-shop-cookie=") !== 0) {
+                        continue;
+                    }
+                    var raw = part.substring("plenty-shop-cookie=".length);
+                    var data = null;
+                    // Einmal (oder sicherheitshalber zweimal) dekodieren, dann als JSON lesen
+                    for (var round = 0; round < 2 && data === null; round++) {
+                        raw = decodeURIComponent(raw);
+                        try {
+                            data = JSON.parse(raw);
+                        } catch (parseError) {
+                            data = null;
+                        }
+                    }
+                    return data && typeof data === "object" ? data : null;
+                }
+            } catch (error) {
+                // Cookie nicht lesbar – dann eben ohne
+            }
+            return null;
         }
 
-        /* Aktuellen Einwilligungsstand aus dem plentyShop-Cookie-Banner lesen */
-        function readConsentState() {
+        /* Ist ein Schlüssel "gruppe.dienst" laut Cookie erlaubt? */
+        function isConsentedByCookie(key) {
+            var data = readConsentCookie();
+            if (!data || !key) {
+                return false;
+            }
+            var dot = key.indexOf(".");
+            if (dot < 1) {
+                return false;
+            }
+            var group = data[key.substring(0, dot)];
+            return !!(group && typeof group === "object" && group[key.substring(dot + 1)] === true);
+        }
+
+        /* Ist der ConsentManager von plentyShop schon da und hat der Besucher geantwortet? */
+        function consentManagerReady() {
             var cm = window.ConsentManager;
-            if (!cm || typeof cm.hasResponse !== "function" || !cm.hasResponse()) {
+            return !!(cm && typeof cm.hasResponse === "function" && typeof cm.isConsented === "function" && cm.hasResponse());
+        }
+
+        /* Hilfe: Ist ein Consent-Schlüssel erlaubt?
+           Vorrang hat der ConsentManager; solange er noch nicht geladen ist, gilt das Cookie. */
+        function isConsented(key) {
+            if (!key) {
+                return false;
+            }
+            var cm = window.ConsentManager;
+            if (cm && typeof cm.isConsented === "function" && (typeof cm.hasResponse !== "function" || cm.hasResponse())) {
+                return !!cm.isConsented(key);
+            }
+            return isConsentedByCookie(key);
+        }
+
+        /* Aktuellen Einwilligungsstand lesen (ConsentManager oder – im <head> – das Cookie) */
+        function readConsentState() {
+            if (!consentManagerReady() && readConsentCookie() === null) {
                 return null;
             }
             var analytics = isConsented(cfg.consentKeys.analytics);
