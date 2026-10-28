@@ -1097,7 +1097,7 @@
                 idListComma: ids.join(","),
                 idListPipe: ids.join("|"),
                 idListSemicolon: ids.join(";"),
-                customerMail: toText(customer.email),
+                customerMail: cfg.sendCustomerData === false ? "" : toText(customer.email),
                 customerID: customer.contactId || 0,
                 visitorLogin: customer.isGuest ? "guest" : "customer",
                 town: toText(customer.town),
@@ -1115,10 +1115,19 @@
         if (USE_CFOUR) {
             // Positionen wie beim bisherigen Plugin: "price" brutto, "priceNet" netto (auch bei B2B-Bestellungen)
             var cfourProducts = grossProducts;
+            /*
+             * E-Mail-Adresse aus der Rechnungsadresse (auch bei Gastbestellungen) für die
+             * "Erweiterten Conversions" von Google Ads. Bitte Stefan Kaltenecker, 28.10.2026:
+             * Der Kauf-Tag liest sie aus "customerEmail". Leer, wenn die Plugin-Einstellung
+             * "Kundendaten für Erweiterte Conversions übergeben" ausgeschaltet ist.
+             */
+            var cfourEmail = cfg.sendCustomerData === false ? "" : toText(customer.email);
             push({
                 event: "orderConfirmation",
                 currency: orderCurrency,
+                customerEmail: cfourEmail,
                 orderData: [{
+                    customerEmail: cfourEmail,
                     orderId: order.orderId,
                     amount: toNumber(order.totalGross),
                     amountNet: toNumber(order.totalNet),

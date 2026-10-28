@@ -23,7 +23,7 @@ class TrackingConfig
     const PLUGIN = 'BermaroTracking';
 
     /** Plugin-Version, wird zum Neuladen der JS-Datei (Cache) verwendet */
-    const VERSION = '1.0.18';
+    const VERSION = '1.0.19';
 
     /** Alle möglichen Datenformate */
     const FORMATS = ['felixries', 'cfour', 'ga4'];
@@ -390,6 +390,8 @@ class TrackingConfig
             'maxListItems'            => $this->getInt('events.maxListItems', 24, 1, 200),
             'valueBasis'              => $valueBasis,
             'onlyOnce'                => $this->getBool('purchase.onlyOnce', true),
+            // Kundendaten (E-Mail usw.) für "Erweiterte Conversions" – gilt auch für das Sicherheitsnetz im Browser
+            'sendCustomerData'        => $this->getBool('purchase.sendCustomerData', true),
             'consentMode'             => $consentMode,
             'loadGtmOnlyAfterConsent' => $this->getBool('consent.loadGtmOnlyAfterConsent', false),
             'pushConsentChanged'      => $this->getBool('consent.pushConsentChanged', true),

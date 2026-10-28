@@ -220,4 +220,4 @@ Abgleich mit GTM-KVGNQMX (pelletgrill.rocks, 22.10.2026): Die GA4-Ereignisse erz
 
 Abgleich mit GTM-TVGX67G (b2b.bermaro.de, 22.10.2026): Aktiv relevant sind nur Google-Ads-Conversion (orderData.0.orderId, orderData.0.itemSum, currency) und Remarketing; die übrigen Tags sind abgeschaltete Universal-Analytics-Tags.
 
-Versionsstand: 1.0.18 (27.10.2026)
+Versionsstand: 1.0.19 (28.10.2026)

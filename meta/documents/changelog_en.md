@@ -1,5 +1,10 @@
 # Release notes BERMARO Tracking
 
+## 1.0.19 (2026-10-28)
+
+- cfour format (pelletgrill.rocks, B2B): the "orderConfirmation" event now contains the billing e-mail address (guest orders too) as `customerEmail` and `orderData[0].customerEmail` for Google Ads enhanced conversions.
+- The setting "Send customer data for enhanced conversions" now also applies to the browser fallback (order read from the page).
+
 ## 1.0.18 (2026-10-27)
 
 - Tag Manager loads in the `<head>` again: plentyShop LTS moves all `<script>` tags from layout containers to the end of the page. The head script tags now carry `data-bermaro-head="v2"`, which the Ceres filter skips.

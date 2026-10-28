@@ -1,5 +1,10 @@
 # Versionshinweise BERMARO Tracking
 
+## 1.0.19 (28.10.2026)
+
+- cfour-Format (pelletgrill.rocks, B2B): Das Ereignis "orderConfirmation" enthält jetzt die E-Mail-Adresse aus der Rechnungsadresse (auch bei Gastbestellungen) – als `customerEmail` direkt im Push und als `orderData[0].customerEmail`. Damit kann der Google-Ads-Kauf-Tag "Erweiterte Conversions" für fast alle Käufe nutzen (vorher nur ca. 7 %, Bitte Stefan Kaltenecker 28.10.2026).
+- Die Einstellung "Kundendaten für Erweiterte Conversions übergeben" gilt jetzt auch für das Sicherheitsnetz im Browser (Bestellung aus der Seite gelesen): Ist sie ausgeschaltet, wird keine E-Mail-Adresse übergeben.
+
 ## 1.0.18 (27.10.2026)
 
 - Tag Manager lädt wieder im `<head>`: plentyShop LTS verschiebt alle `<script>`-Tags aus Layout-Containern ans Seitenende (Ceres-Filter `TwigStyleScriptTagFilter`). Dadurch startete der Tag Manager erst nach dem Seitenaufbau, und Google Ads meldete am 27.10.2026 „Tag nicht richtig platziert – zu weit unten auf der Seite“. Die beiden Script-Tags in `Head.twig` tragen jetzt das Merkmal `data-bermaro-head="v2"`, das der Ceres-Filter bewusst übergeht.
